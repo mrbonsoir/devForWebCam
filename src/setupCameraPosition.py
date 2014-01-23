@@ -17,17 +17,21 @@ from colorDifferences import *
 from webcamToolbox import *
 
 # Global variables
-number_camera = 1
 max_number_point_to_show = 5
 max_number_frame_to_keep = 200
-tabOscillographeDifferences = np.zeros((4,max_number_frame_to_keep))
+tab_oscillographe_differences = np.zeros((4,max_number_frame_to_keep))
     
-def funShowWebcamStream(numSelectCamera):
-    global tabOscillographeDifferences
-    camera = initCamera(numSelectCamera)
+def function_show_webcam_stream(type_camera_number = 0):
+    ''' The function display a webcam stream and overlay some information 
+    on the top of each frame.
+
+    Kt
+    '''
+    global tab_oscillographe_differences
+    camera = function_initialize_camera(type_camera_number)
     cv.NamedWindow("WindowWebcam")
-    widthFrame = int(640)
-    heightFrame = int(480)    
+    width_frame  = int(640)
+    height_frame = int(480)    
     
     # rectangle coordinates
     sub_rec1 = np.array([220,200,80,80])
@@ -35,33 +39,40 @@ def funShowWebcamStream(numSelectCamera):
     
     while True:
         frame = cv.QueryFrame(camera)
-        print frame
+        # print frame
         # conversion to Lab
-        imFilter = cv.CreateImage((widthFrame,heightFrame), cv.IPL_DEPTH_8U,3)
-        cv.CvtColor(frame, imFilter,cv.CV_BGR2Lab)
-        imFilter = frame
+        image_filter = cv.CreateImage((width_frame, height_frame), cv.IPL_DEPTH_8U,3)
+        cv.CvtColor(frame, image_filter,cv.CV_BGR2Lab)
+        image_filter = frame
 
-        frame, dL, dLab, LabT, LabB, dY, XYZT, XYZB, dRGB = funDisplayLiveInformation(frame, widthFrame, heightFrame, sub_rec1, sub_rec2)
+        frame, dL, dLab, LabT, LabB, dY, XYZT, XYZB, dRGB = function_display_live_information(frame, width_frame, height_frame, sub_rec1, sub_rec2)
         
         # Here we do something to display data difference as an osilloscope
-        tabOscillographeDifferences[:,0:-1] = tabOscillographeDifferences[:,1:]
-        tabOscillographeDifferences[:,-1] = [dL, dLab, dY, dRGB]
+        tab_oscillographe_differences[:,0:-1] = tab_oscillographe_differences[:,1:]
+        tab_oscillographe_differences[:,-1] = [dL, dLab, dY, dRGB]
 
-        frame = funDisplayOscilliscope(frame, widthFrame, heightFrame, tabOscillographeDifferences)
+        frame = function_display_oscilloscope(frame, width_frame, height_frame, tab_oscillographe_differences)
         
         # --------------------------------------------
         cv.ShowImage("WindowWebcam",frame)
-        if cv.WaitKey(10) == 113: # Leaves the live strean if q is pressed.
-            print 'Il faut sortir maintenant, faut pas rester ici.'
-            break    
+        k = cv.WaitKey(1)
+        if k == ord('q'):
+            print "Il faut sortir maintenant, faut pas rester ici."
+            break
 
     return 1
 
 def main():
-    global number_camera
-    print 'The camera number is:',number_camera
-    funShowWebcamStream(number_camera)
-    return 1
+    ''' The main function can gets as input parameter the camera number you want to 
+    use.
+    '''
+    if len(sys.argv) == 1:
+        print 'The camera number is 0.'
+        function_show_webcam_stream()
+    else:
+        print 'The camera number is'+sys.argv[1]+'.'
+        function_show_webcam_stream(int(sys.argv[1]))
+    
       
 # And now we start  
 main()
