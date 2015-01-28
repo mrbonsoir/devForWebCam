@@ -14,7 +14,7 @@ import Image
 import time
 from colorConversion import *
 from colorDifferences import *
-from webcamToolbox import *
+from webcamTools import *
 
 # Global variables
 max_number_point_to_show = 5

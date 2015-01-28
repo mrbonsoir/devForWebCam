@@ -7,9 +7,10 @@ well enough adjusted.
 
 import sys
 import cv2.cv as cv
-import numpy as np'''
+import numpy as np
+'''
 Created on 21.01.2013
-Here we position the camera to do measurement once the configuratin is
+Here we position the camera to do measurement once the configuration is
 well enough adjusted. 
 @author: gerjer
 '''
@@ -553,7 +554,6 @@ def funDoHalftoningByMaskLinear(im):
     
     return image_halftoned
 
-
 def funDoHalftoningByMaskRandom(im):
     '''
     The function halfotned the image using the mask technic.
@@ -584,7 +584,6 @@ def funDoHalftoningByMaskRandom(im):
             imHalfoned[ii:ii+size_mask, jj:jj+size_mask] = data_block
             print data_block
     return imHalfoned
-
 
 def funDoHalftoningByMaskRandomRGB(imRGB):
     '''
@@ -669,7 +668,6 @@ def funDoHalftoningByMaskFullRandom(im):
     
     return image_halftoned
 
-
 def funDoHalftoningByMaskFullRandomRGB(imRGB):
     '''
     The same as above but in color
@@ -727,7 +725,6 @@ def funDoHalftoningByMaskFullRandomRGB(imRGB):
     
     return image_halftoned
     
-
 def funSuperFittFunction(x, A, B, alpha, beta):
     '''
     This function is a super gamma curve swiss knife.
@@ -761,25 +758,6 @@ def function_display_RC_by_user(data_by_User):
     plt.xlim(0,255)
     plt.ylim(0,255)
     plt.draw()
-import scipy
-from scipy import interpolate
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-import Image
-import time
-from colorConversion import *
-from colorDifferences import *
-
-
-# I choose a grey level for the test patch
-# Then I create a base patch with I_test = 2 x I_base
-# Then I combine both patched together and display them
-# Then I measure the intensity of both
-# Then three time I do:
-#    - I increase the red channel of I_base until I_basse = I_test+r
-#    - I increase the green channel of I_base until I_basse = I_test+g
-#    - I increase the blue channel of I_base until I_basse = I_test+b
-# And then we have three ratios
 
 def initCamera(selectCamera):
     ''' 
@@ -1231,7 +1209,6 @@ def funDoHalftoningByMaskLinear(im):
     
     return image_halftoned
 
-
 def funDoHalftoningByMaskRandom(im):
     '''
     The function halfotned the image using the mask technic.
@@ -1262,7 +1239,6 @@ def funDoHalftoningByMaskRandom(im):
             imHalfoned[ii:ii+size_mask, jj:jj+size_mask] = data_block
             print data_block
     return imHalfoned
-
 
 def funDoHalftoningByMaskRandomRGB(imRGB):
     '''
@@ -1343,7 +1319,6 @@ def funDoHalftoningByMaskFullRandom(im):
     
     return image_halftoned
 
-
 def funDoHalftoningByMaskFullRandomRGB(imRGB):
     '''
     The same as above but in color
@@ -1400,7 +1375,6 @@ def funDoHalftoningByMaskFullRandomRGB(imRGB):
     image_halftoned = image_halftoned[0:size_image[0],0:size_image[1],:]
     
     return image_halftoned
-    
 
 def funSuperFittFunction(x, A, B, alpha, beta):
     '''
