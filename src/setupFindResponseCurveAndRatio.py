@@ -1,10 +1,11 @@
 '''
 In that program we want to measure the response curve of a given display.
 
-To do so we compare hapftoned and non-halftoned patches from which we know to input level.
+To do so we compare halftoned and non-halftoned patches from which we know to input level.
 
 Basically we do luminance matching and where it is becoming smart is we don't ask people to do it, we ask
 the webcam gently attached to the Kompiouteur.
+
 Jeremie Gerhardt - 26.06.13
 '''
 
@@ -24,7 +25,7 @@ import Image
 import time
 from colorConversion import *
 from colorDifferences import *
-from webcamToolbox import *
+from webcamTools import *
 import sys
 
 # Some global variabl
@@ -74,8 +75,8 @@ vecLevelTarget2 = 80
 
 
 prefixName = 'test35'
-dirToSaveWebcamFrame = '/home/jeremie/workspace/devForWebcam/frameWebcam/'
-dirToSaveResults = '/home/jeremie/workspace/devForWebcam/results/'
+dirToSaveWebcamFrame = '/home/jeremie/Documents/workspace/devForWebcam/frameWebcam/'
+dirToSaveResults = '/home/jeremie/Documents/workspace/devForWebcam/results/'
 
 
 def funDisplayWebcamAndTakePictures(number_camera): 

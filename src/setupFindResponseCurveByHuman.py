@@ -20,7 +20,7 @@ import Image
 import time
 from colorConversion import *
 from colorDifferences import *
-from webcamToolbox import *
+from webcamToos import *
 import sys
 
 # Some global variabl
@@ -34,8 +34,8 @@ stepVecSearch = 64
 vecSearchLevel = np.round(np.hstack((np.arange(0,255, stepVecSearch), 255)))
 
 prefixName = 'test35'
-dirToSaveWebcamFrame = '/home/jeremie/workspace/devForWebcam/frameWebcam/'
-dirToSaveResults = '/home/jeremie/workspace/devForWebcam/results/'
+dirToSaveWebcamFrame = '/home/jeremie/Documents/workspace/devForWebcam/frameWebcam/'
+dirToSaveResults = '/home/jeremie/Documents/workspace/devForWebcam/results/'
 
 
 def function_get_response_curve_from_human(widthF,heightF):
