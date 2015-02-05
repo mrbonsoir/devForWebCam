@@ -26,12 +26,12 @@ import time
 from colorConversion import *
 from colorDifferences import *
 from webcamTools import *
-import sys
+import sys, os, shutil
 
 # Some global variabl
 number_camera = 1 # On my laptop, 0 is for the laptop cam, 1 is for the plugged cam
 max_number_frame_to_wait_between_measurement = 50
-max_number_frame_to_keep = 250
+max_number_frame_to_keep = 25
 tabOscillographeDifferences = np.zeros((4,max_number_frame_to_keep))
 max_number_point_to_show = 3
 mid_level = 128
@@ -51,7 +51,6 @@ sizeTilePatchHT = 256  # parameter for the HT patches with halftoning by mask
 vecLevel = np.round(np.hstack((np.arange(0, 255, 64), 255)))
 stepVecSearch = 64
 vecSearchLevel = np.round(np.hstack((np.arange(0,255, stepVecSearch), 255)))
-
 vecSearchLevelExp3 = vecSearchLevel#np.round(np.linspace(0,255,10))
 
 '''
@@ -73,10 +72,31 @@ vecLevelTarget = 60
 vecLevelBasis2 = np.array([60, 60 , 60])
 vecLevelTarget2 = 80
 
+prefixName = str(sys.argv[1])
+print 'Name of the experiment is '+prefixName
+workDir = os.getcwd()
+# create some directories to store the results
+# test if the directory for storing the results already exist:
+if os.path.isdir(workDir+'/'+prefixName):
+    print 'The folder '+workDir+' already exist.'
+    print 'It''s going to be removed.'
+    
+    #if os.path.isdir(workDir+'/'+prefixName+'/frameWebcam/'):
+    #   os.rmdir(workDir+'/'+prefixName+'/frameWebcam/')
+    #
+    #if os.path.isdir(workDir+'/'+prefixName+'/results/'):
+    #   os.rmdir(workDir+'/'+prefixName+'/results/')
+    #   os.rmdir(workDir+'/'+prefixName)
 
-prefixName = 'test35'
-dirToSaveWebcamFrame = '/home/jeremie/Documents/workspace/devForWebcam/frameWebcam/'
-dirToSaveResults = '/home/jeremie/Documents/workspace/devForWebcam/results/'
+    shutil.rmtree(workDir+'/'+prefixName)
+
+else:
+    os.mkdir(workDir+'/'+prefixName+'/')
+    # I can create the folder and subfolder to store the results
+    dirToSaveWebcamFrame = workDir+'/'+prefixName+'/frameWebcam/'
+    os.mkdir(dirToSaveWebcamFrame)
+    dirToSaveResults = workDir+'/'+prefixName+'/results/'
+    os.mkdir(dirToSaveResults)
 
 
 def funDisplayWebcamAndTakePictures(number_camera): 
@@ -474,7 +494,6 @@ def function_get_response_curve_from_human(widthF,heightF):
     print tabSelectedLevel
 
     return tabSelectedLevel
-
 
 def funGetRatioByChannel(camera, widthF, heightF, sub_rec1, sub_rec2, valLevelBasis, valLevelTarget):
     '''
@@ -984,6 +1003,7 @@ def main():
     global sizeTilePatchHT
     global stepVecSearch
     global vecSearchLevelExp3
+    #global dirToSaveWebcamFrame
 
     #print 'Number of arguments:', len(sys.argv), 'arguments.'
     #print 'Argument List:', str(sys.argv)
