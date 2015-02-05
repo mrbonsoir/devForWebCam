@@ -77,27 +77,31 @@ print 'Name of the experiment is '+prefixName
 workDir = os.getcwd()
 # create some directories to store the results
 # test if the directory for storing the results already exist:
-if os.path.isdir(workDir+'/'+prefixName):
-    print 'The folder '+workDir+' already exist.'
-    print 'It''s going to be removed.'
-    
-    #if os.path.isdir(workDir+'/'+prefixName+'/frameWebcam/'):
-    #   os.rmdir(workDir+'/'+prefixName+'/frameWebcam/')
-    #
-    #if os.path.isdir(workDir+'/'+prefixName+'/results/'):
-    #   os.rmdir(workDir+'/'+prefixName+'/results/')
-    #   os.rmdir(workDir+'/'+prefixName)
 
-    shutil.rmtree(workDir+'/'+prefixName)
+if str(sys.argv[4]): # experiment have down already and we want just to recreate the figure
+    if os.path.isdir(workDir+'/'+prefixName):
+        print 'The folder '+workDir+' already exist.'
+        print 'It''s going to be removed.'
+     
+        shutil.rmtree(workDir+'/'+prefixName)
+
+        # For now it is a bit brutal because everything is removed
+        os.mkdir(workDir+'/'+prefixName+'/')
+        dirToSaveWebcamFrame = workDir+'/'+prefixName+'/frameWebcam/'
+        os.mkdir(dirToSaveWebcamFrame)
+        dirToSaveResults = workDir+'/'+prefixName+'/results/'
+        os.mkdir(dirToSaveResults)
+
+    else:
+        os.mkdir(workDir+'/'+prefixName+'/')
+        # I can create the folder and subfolder to store the results
+        dirToSaveWebcamFrame = workDir+'/'+prefixName+'/frameWebcam/'
+        os.mkdir(dirToSaveWebcamFrame)
+        dirToSaveResults = workDir+'/'+prefixName+'/results/'
+        os.mkdir(dirToSaveResults)
 
 else:
-    os.mkdir(workDir+'/'+prefixName+'/')
-    # I can create the folder and subfolder to store the results
-    dirToSaveWebcamFrame = workDir+'/'+prefixName+'/frameWebcam/'
-    os.mkdir(dirToSaveWebcamFrame)
-    dirToSaveResults = workDir+'/'+prefixName+'/results/'
-    os.mkdir(dirToSaveResults)
-
+    print 'We look at the figures again without redoing the experiment.'
 
 def funDisplayWebcamAndTakePictures(number_camera): 
     '''
