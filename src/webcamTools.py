@@ -82,36 +82,6 @@ def imCreateTestchartPatchBase(levelPatch, levelBase):
     
     return imagePatchBase
 
-def imCreateTestchartContinuousAndHalftoned(levelContinuous, levelHalftoned, sizeTileHalftone):
-    '''
-    Here I create the image, one side continuous and the other halftoned.
-    The sizeTileHalftone parameter is used to play with the size of the point in 
-    the HT patch. sizeTileHalftone = 16 is the minimum.
-    '''
-    width = 1024
-    height = 720
-    imageTestchartContinuousHalfoned = np.zeros((height, width), np.uint8)
-    imageTestchartContinuousHalfoned[0:104,:] = 0
-    imageTestchartContinuousHalfoned[617:height,:] = 0
-    
-    im1 = np.ones((512,512),np.uint8)*levelContinuous # continous part of the testchart
-    
-    #-- method Error Diffusion
-    im2 = np.ones((sizeTileHalftone,sizeTileHalftone))* (levelHalftoned / 255.)
-    #im2 = funDoErrorDiffusion_FloydSteinberg(im2)
-    #im2 = funDoErrorDiffusion_JarvisAndAll(im2)
-    im2 = funDoHalftoningByMaskFullRandom(im2)
-    #im2 = funDoHalftoningByMaskLinear(im2)
-    im_src = cv.fromarray(im2*255)
-    im_dst = cv.CreateMat(512,512, cv.CV_64FC1)
-    cv.Resize(im_src, im_dst, interpolation=cv.CV_INTER_NN)
-    im22 = np.asarray(im_dst)
-    
-    # and finally
-    imageTestchartContinuousHalfoned[104:616,0:512] = im1
-    imageTestchartContinuousHalfoned[104:616,512:width] = im22
-
-    return imageTestchartContinuousHalfoned
 
 def funDiffPatches(subA, subB):
     '''
@@ -800,11 +770,16 @@ def imCreateTestchartPatchBase(levelPatch, levelBase):
     
     return imagePatchBase
 
+
 def imCreateTestchartContinuousAndHalftoned(levelContinuous, levelHalftoned, sizeTileHalftone):
     '''
     Here I create the image, one side continuous and the other halftoned.
     The sizeTileHalftone parameter is used to play with the size of the point in 
     the HT patch. sizeTileHalftone = 16 is the minimum.
+
+    Actually it can be smaller than 16, but there will be a problem because
+    of the Ht by mask, to have a minimum size of 16 ensures that 256 levels 
+    available.
     '''
     width = 1024
     height = 720
@@ -1289,10 +1264,10 @@ def funDoHalftoningByMaskFullRandom(im):
     # create the mask random
     data_mask = np.random.rand(size_mask,size_mask)
     data_mask = np.resize(data_mask,(1,size_mask * size_mask))
-    data_mask = np.argsort(data_mask)  / 255.
+    data_mask = np.argsort(data_mask)  / 256.
     data_mask = np.resize(data_mask,(size_mask,size_mask))
 
-    # creat the image mask 
+    # create the image mask 
     size_data_mask_image_factor = np.zeros(2)
     if rest_division_image_size[0,1] != 0:
         size_data_mask_image_factor[0] = rest_division_image_size[0,0] + 1
@@ -1311,7 +1286,7 @@ def funDoHalftoningByMaskFullRandom(im):
     image_with_border[0:size_image[0], 0:size_image[1]] = im
 
     # do the halftoning
-    image_halftoned = image_with_border >= image_data_mask
+    image_halftoned = image_with_border > image_data_mask
     image_halftoned = image_halftoned.astype(float)
 
     # and we remove the added border:

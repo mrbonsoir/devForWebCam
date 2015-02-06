@@ -78,30 +78,31 @@ workDir = os.getcwd()
 # create some directories to store the results
 # test if the directory for storing the results already exist:
 
-if str(sys.argv[4]): # experiment have down already and we want just to recreate the figure
-    if os.path.isdir(workDir+'/'+prefixName):
-        print 'The folder '+workDir+' already exist.'
-        print 'It''s going to be removed.'
-     
-        shutil.rmtree(workDir+'/'+prefixName)
+if len(sys.argv) > 2:
+    if str(sys.argv[4]): # experiment have down already and we want just to recreate the figure
+        if os.path.isdir(workDir+'/'+prefixName):
+            print 'The folder '+workDir+' already exist.'
+            print 'It''s going to be removed.'
+         
+            shutil.rmtree(workDir+'/'+prefixName)
 
-        # For now it is a bit brutal because everything is removed
-        os.mkdir(workDir+'/'+prefixName+'/')
-        dirToSaveWebcamFrame = workDir+'/'+prefixName+'/frameWebcam/'
-        os.mkdir(dirToSaveWebcamFrame)
-        dirToSaveResults = workDir+'/'+prefixName+'/results/'
-        os.mkdir(dirToSaveResults)
+            # For now it is a bit brutal because everything is removed
+            os.mkdir(workDir+'/'+prefixName+'/')
+            dirToSaveWebcamFrame = workDir+'/'+prefixName+'/frameWebcam/'
+            os.mkdir(dirToSaveWebcamFrame)
+            dirToSaveResults = workDir+'/'+prefixName+'/results/'
+            os.mkdir(dirToSaveResults)
+
+        else:
+            os.mkdir(workDir+'/'+prefixName+'/')
+            # I can create the folder and subfolder to store the results
+            dirToSaveWebcamFrame = workDir+'/'+prefixName+'/frameWebcam/'
+            os.mkdir(dirToSaveWebcamFrame)
+            dirToSaveResults = workDir+'/'+prefixName+'/results/'
+            os.mkdir(dirToSaveResults)
 
     else:
-        os.mkdir(workDir+'/'+prefixName+'/')
-        # I can create the folder and subfolder to store the results
-        dirToSaveWebcamFrame = workDir+'/'+prefixName+'/frameWebcam/'
-        os.mkdir(dirToSaveWebcamFrame)
-        dirToSaveResults = workDir+'/'+prefixName+'/results/'
-        os.mkdir(dirToSaveResults)
-
-else:
-    print 'We look at the figures again without redoing the experiment.'
+        print 'We look at the figures again without redoing the experimentself.'
 
 def funDisplayWebcamAndTakePictures(number_camera): 
     '''
@@ -1016,7 +1017,7 @@ def main():
         print ' '
         print 'The program functions as follows:'
         print 'python setupFindResponseCurveAndRatio.py options'
-        print 'where "options" are: name_test size_tile_patch_HT step_vector_search bool_experiment [camera_number]'
+        print 'where "options" are: [name_test] [size_tile_patch_HT] [step_vector_search bool_experiment] [camera_number]'
         print ' '
         print 'Some example to start an experiment:'
         print '     python setupFindResponseCurveAndRatio.py test33 256 64 True 1'
@@ -1068,7 +1069,7 @@ def main():
 
         responseCurve = funComputeResponseCurveFromMeasurement(dataDiff, vecLevel, vecSearchLevel)
 
-    # load resutls from experiment "2"
+    # load results from experiment "2"
     if selectExperiment_2:
         # load data obtained with the Stellar device:
         print 'data ramp', vecSearchLevel
