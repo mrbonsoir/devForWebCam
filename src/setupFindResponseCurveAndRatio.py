@@ -144,13 +144,13 @@ def funDisplayWebcamAndTakePictures(number_camera):
     levelHalftone = mid_level
 
     # save the vecSearch and vecLevel for later use:
-    np.savetxt(dirToSaveResults+prefixName+'_vecSearchLevel.txt', (vecSearchLevel),fmt='%03.2f') 
-    np.savetxt(dirToSaveResults+prefixName+'_vecLevel.txt', (vecLevel),fmt='%03.2f')        
-    np.savetxt(dirToSaveResults+prefixName+'_vecSearchLevelExp3.txt', (vecSearchLevelExp3),fmt='%03.2f')        
+    np.savetxt('./'+prefixName+'_vecSearchLevel.txt', (vecSearchLevel),fmt='%03.2f') 
+    np.savetxt('./'+prefixName+'_vecLevel.txt', (vecLevel),fmt='%03.2f')        
+    np.savetxt('./'+prefixName+'_vecSearchLevelExp3.txt', (vecSearchLevelExp3),fmt='%03.2f')        
 
 
     # initialize table of data to show later the difference as oscilloscope
-        # print the different options in the termninal
+    # print the different options in the termninal
     print 'If you press theses keys 1, 2, 3, 4 or q then this will happend:'
     print '1 -> measurement starts according to your input parameter when calling the program.'
     print '2 -> same as 1 but faster where ramp of both continuous and haltoned patched are measured.'
@@ -238,7 +238,7 @@ def funDisplayWebcamAndTakePictures(number_camera):
        
         '''
         If you press 'm' again it will restart the measurements and replace the existing figure and txt
-        files from the previous sessionh.
+        files from the previous session.
         '''
 
         if k_pressed == ord('q'):#cv.WaitKey(10) == 113: # if the letter 'q' is pressed then we quit.

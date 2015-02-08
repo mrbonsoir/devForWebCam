@@ -41,7 +41,24 @@ and you can tune the position of you camera Vs projector and projection surface.
 
 # What to do next?
 
-Now it is time to do measurement! The moment you were waiting for an eternity. You camera is in place, you just need to use the other Python little programs:
+Now it is time to do measurement! The moment you were waiting for an eternity. Your camera is in place, you just need to use the *setupFindResponseCurveAndRatio.py* program. This code allows you to do the several things. These things are presented in the command window when you launch it doing:
 
-- *setupFindResponseCurveAndRatio.py* is a pretty cool tool as it allows you to evaluate the tone response curve of your display. It does more as is also evaluate ratio parameters to do even more.
-- *setupFindReponseCurveByHuman.py* does the same as the previous python code, except the final judgement is given by a human feedback.
+```
+python setupFindCResponseCurveAndRatio.py [name_test] [size_tile_patch_HT] [step_vector_search bool_experiment] [camera_number]
+```
+
+and if you write 
+
+```
+python setupFindCResponseCurveAndRatio.py help
+```
+
+you should get some info about the input parameters.
+
+But basically you can:
+
+- measure response curve with the webcam
+	- a slow version
+	- a faster version
+	- a human feedback version
+- measure the ratio by channel
