@@ -372,6 +372,8 @@ def funGetSomeMinimumSingleCurve(interpM):
     '''
     Function used by the funGetMinForEachChannel to find the minimum 
     in one single interp entree.
+
+    In theory this function is giving me the response curve.
     '''
     print 'size interpM is ',np.shape(interpM)
     minM = np.zeros((np.shape(interpM)[0],1))

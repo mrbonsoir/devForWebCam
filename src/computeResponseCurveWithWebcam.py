@@ -21,99 +21,43 @@ from colorDifferences import *
 from webcamTools import *
 import sys, os, shutil
 
-# setup parameters
-
-# call the function to use the webcam
-
-# save the resutls
-
-
-
-# Some global variabl
-number_camera = 1 # On my laptop, 0 is for the laptop cam, 1 is for the plugged cam
+configTest = True
+configMeasurement = False
+number_camera = 1
 max_number_frame_to_wait_between_measurement = 50
-max_number_frame_to_keep = 25
+max_number_frame_to_keep  = 25
 tabOscillographeDifferences = np.zeros((4,max_number_frame_to_keep))
 max_number_point_to_show = 3
 mid_level = 128
-
-# Measurement or data analysis
-configMeasurement = True
-
-# Some global variables to set for experiment 1 and 2
-selectExperiment_1 = False
-selectExperiment_2 = False
-selectExperiment_5 = False
 sizeTilePatchHT = 256  # parameter for the HT patches with halftoning by mask
-
-#vecLevel = np.round(np.linspace(0,255,8))       # To which step we want the measurement
-#vecSearchLevel = np.round(np.linspace(0,255,12)) # To which step we want the point to get the difference curve
-
-vecLevel = np.round(np.hstack((np.arange(0, 255, 64), 255)))
-stepVecSearch = 64
-vecSearchLevel = np.round(np.hstack((np.arange(0,255, stepVecSearch), 255)))
-vecSearchLevelExp3 = vecSearchLevel#np.round(np.linspace(0,255,10))
-
-'''
-# Example for setting up the last two parameters:
-# - I want to have measurement for a ramp space of 32 digital values so:
-#>>> vecLevel = np.round(np.linspace(0,255,32))
-# - and for each of this point I will take the measurement at space 16, so
-#>>> vecSearchLevel = np.round(np.linspace(0,255,16))
-# Ohter example, I want my RC made of 5 equally space point and measurement difference curve with twice the precision, so:
-# vecLevel = np.round(np.linspace(0,255,5))       
-# vecSearchLevel = np.round(np.linspace(0,255,10)) 
-'''
-
-# Some global variables to set for experiment 1 and 2
-selectExperiment_3 = False
-vecLevelBasis = np.array([30,30, 30])
-vecLevelTarget = 60
-
-vecLevelBasis2 = np.array([60, 60 , 60])
-vecLevelTarget2 = 80
-
-prefixName = str(sys.argv[1])
-print 'Name of the experiment is '+prefixName
+dirToSaveResults = './'
 workDir = os.getcwd()
-# create some directories to store the results
-# test if the directory for storing the results already exist:
 
-if len(sys.argv) > 2:
-    if str(sys.argv[4]): # experiment have down already and we want just to recreate the figure
-        if os.path.isdir(workDir+'/'+prefixName):
-            print 'The folder '+workDir+' already exist.'
-            print 'It''s going to be removed.'
-         
-            shutil.rmtree(workDir+'/'+prefixName)
+# config test
+if configTest:
+    prefixName         = 'beta33'
+    stepVecLevel       = 128
+    vecLevel           = np.round(np.hstack((np.arange(0, 255, stepVecLevel), 255)))
+    stepVecLevelSearch = 64
+    vecSearchLevel     = np.round(np.hstack((np.arange(0,255, stepVecLevelSearch), 255)))
 
-            # For now it is a bit brutal because everything is removed
-            os.mkdir(workDir+'/'+prefixName+'/')
-            dirToSaveWebcamFrame = workDir+'/'+prefixName+'/frameWebcam/'
-            os.mkdir(dirToSaveWebcamFrame)
-            dirToSaveResults = workDir+'/'+prefixName+'/results/'
-            os.mkdir(dirToSaveResults)
+# config measurement
+if configMeasurement:
+    prefixName         = 'test33'
+    stepVecLevel       = 64
+    vecLevel           = np.round(np.hstack((np.arange(0, 255, stepVecLevel), 255)))
+    stepVecLevelSearch = 32
+    vecSearchLevel     = np.round(np.hstack((np.arange(0,255, stepVecLevelSearch), 255)))
 
-        else:
-            os.mkdir(workDir+'/'+prefixName+'/')
-            # I can create the folder and subfolder to store the results
-            dirToSaveWebcamFrame = workDir+'/'+prefixName+'/frameWebcam/'
-            os.mkdir(dirToSaveWebcamFrame)
-            dirToSaveResults = workDir+'/'+prefixName+'/results/'
-            os.mkdir(dirToSaveResults)
-
-    else:
-        print 'We look at the figures again without redoing the experimentself.'
 
 def funDisplayWebcamAndTakePictures(number_camera): 
     '''
     The function is looping and waiting for you to choose which experiment to start.
     '''
+
+    global tabOscillographeDifferences
     global selectExperiment_1
     global selectExperiment_2
-    global selectExperiment_3
-    global selectExperiment_5
-    global tabOscillographeDifferences
 
     # call the webcam
     camera = function_initialize_camera(number_camera)
@@ -137,26 +81,20 @@ def funDisplayWebcamAndTakePictures(number_camera):
     imgTestchart = imCreateTestchartContinuousAndHalftoned(mid_level,mid_level, sizeTilePatchHT)
     imgT = cv.CreateImage((np.shape(imgTestchart)[0],np.shape(imgTestchart)[0]), cv.IPL_DEPTH_8U,1)
     imgT = cv.fromarray(imgTestchart)
-    cv.SaveImage(dirToSaveWebcamFrame+'firstTestChart.png', imgT)
+    cv.SaveImage('./firstTestChart.png', imgT)
     cv.ShowImage("winTestChart",imgT)
 
     ## create Testchart
     levelContinuous = mid_level
-    levelHalftone = mid_level
+    levelHalftone   = mid_level
 
     # save the vecSearch and vecLevel for later use:
     np.savetxt('./'+prefixName+'_vecSearchLevel.txt', (vecSearchLevel),fmt='%03.2f') 
     np.savetxt('./'+prefixName+'_vecLevel.txt', (vecLevel),fmt='%03.2f')        
-    np.savetxt('./'+prefixName+'_vecSearchLevelExp3.txt', (vecSearchLevelExp3),fmt='%03.2f')        
-
-
+    
     # initialize table of data to show later the difference as oscilloscope
-    # print the different options in the termninal
     print 's -> to start the measurement procedure.'
-    print 'r -> to re-start the measure'
     print 'q -> to quit the measurement session.'
-
-
 
     # Start the loop
     while True:
@@ -165,80 +103,30 @@ def funDisplayWebcamAndTakePictures(number_camera):
         cv.ShowImage("Window", frame)
         
         # Always capture the image displayed under the same name. Not very usefull so far.
-        function_capture_image('imtestChartName_128_128.jpg',frame, dirToSaveWebcamFrame)
+        function_capture_image('imtestChartName_128_128.jpg',frame, './')
+        # Here there is time to place the camera.
 
         # Here I start the loop for one channel as we did for CIC in 2012-------------------------------------
         k_pressed = cv.WaitKey(10)
-        if k_pressed == ord("1"): #cv.WaitKey(10) == 49: # i starts if "1" is pressed for measurement
+        if k_pressed == ord("s"): # start the measurement if s is pressed
             selectExperiment_1 = True
             frame, tabDiffL, tabDiffY = funGetResponseCurve(camera, widthFrame, heightFrame, sub_rec1, sub_rec2)
-            print 'You can start over if you want.'
+            print 'Method 1 is over.'
 
             # save all the measurement as text, this will use later to display and analayze the measurements
             np.savetxt(dirToSaveResults+prefixName+'_diffRC_L.txt', (tabDiffL),fmt='%03.2f')
             np.savetxt(dirToSaveResults+prefixName+'_diffRC_Y.txt', (tabDiffY),fmt='%03.2f')
             
-        # Here I start a dumm approach where ramp in continuous tone and HT are diplayed and measured---------
-        if k_pressed == ord("2"):#if cv.WaitKey(10) == 50: # for the letter "2"
             selectExperiment_2 = True
             frame, tabDiffL, tabContinuousL, tabHalftoneL = funGetResponseCurve2(camera, levelContinuous, levelHalftone, widthFrame, heightFrame, sub_rec1, sub_rec2)
+            print 'Method 2 is over.'
 
-            print 'You can start over if you want.'
             # save all the measurement as text
+            np.savetxt(dirToSaveResults+prefixName+'_diffContinuousHalftone_L.txt', (tabDiffL),fmt='%03.2f')
             np.savetxt(dirToSaveResults+prefixName+'_ContinuousRC_L.txt', (tabContinuousL),fmt='%03.2f')
             np.savetxt(dirToSaveResults+prefixName+'_HalftoneRC_L.txt', (tabHalftoneL),fmt='%03.2f')
-            np.savetxt(dirToSaveResults+prefixName+'_diffContinuousHalftone_L.txt', (tabDiffL),fmt='%03.2f')
 
-        # Here I start the method to recover the ratio color Vs grey-------------------------------------------
-        if k_pressed == ord("3"):#if cv.WaitKey(10) == 51: # for the letter "3"
-            selectExperiment_3 = True
-            frame, tabDiffRGBY, tabDiffRGBL, tabResTargetY, tabResBasisY = funGetRatioByChannel(camera, widthFrame, heightFrame, sub_rec1, sub_rec2, vecLevelBasis, vecLevelTarget)
-            
-            # save all the measurement as text
-            np.savetxt(dirToSaveResults+prefixName+'_diffRatioRGB_L.txt', (tabDiffRGBL),fmt='%03.2f')
-            np.savetxt(dirToSaveResults+prefixName+'_diffRatioRGB_Y.txt', (tabDiffRGBY),fmt='%03.2f')        
-            np.savetxt(dirToSaveResults+prefixName+'_diffResTarget_Y.txt', (tabResTargetY),fmt='%03.2f')        
-            np.savetxt(dirToSaveResults+prefixName+'_diffResBasis_Y.txt', (tabResBasisY),fmt='%03.2f')        
-
-            # And we do it again
-            print 'Same player with different input for basis and target'
-            frame, tabDiffRGBY, tabDiffRGBL, tabResTargetY, tabResBasisY = funGetRatioByChannel(camera, widthFrame, heightFrame, sub_rec1, sub_rec2, vecLevelBasis2, vecLevelTarget2)
-            
-            # save all the measurement as text
-            np.savetxt(dirToSaveResults+prefixName+'_diffRatioRGB_L2.txt', (tabDiffRGBL),fmt='%03.2f')
-            np.savetxt(dirToSaveResults+prefixName+'_diffRatioRGB_Y2.txt', (tabDiffRGBY),fmt='%03.2f')        
-            np.savetxt(dirToSaveResults+prefixName+'_diffResTarget_Y2.txt', (tabResTargetY),fmt='%03.2f')        
-            np.savetxt(dirToSaveResults+prefixName+'_diffResBasis_Y2.txt', (tabResBasisY),fmt='%03.2f')        
-
-        # Here we start to get information about the maximum of each projector per channel
-        if k_pressed == ord("4"):#if cv.WaitKey(10) == 52: # for the letter "4"
-            frame, tabDiffRGBY, tabDiffRGBL, tabResTargetY, tabResBasisY = funGetRatioByChannel2(camera, widthFrame, heightFrame, sub_rec1, sub_rec2)
-
-        # Here I start an approach where we ask user feedback instead of the camera
-        if k_pressed == ord("5"):#if cv.WaitKey(10) == 53: # for the letter "5"
-            selectExperiment_5 = True
-            tabAnsweruser = function_get_response_curve_from_human(widthFrame, heightFrame)
-            print tabAnsweruser
-            print 'You can start over if you want. Just if you want.'
-            # save all the measurement as text
-            np.savetxt(dirToSaveResults+prefixName+'val_selected_by_user.txt', (tabAnsweruser),fmt='%03.2f')
-            print selectExperiment_5
-            
-        frame, dL, dLab, LabT, LabB, dY, XYZT, XYZB, dRGB = function_display_live_information(frame, widthFrame, heightFrame, sub_rec1, sub_rec2)
-        # Here we do something to display data difference as an osilloscope
-        tabOscillographeDifferences[:,0:-1] = tabOscillographeDifferences[:,1:]
-        tabOscillographeDifferences[:,-1] = [dL, dLab, dY, dRGB]
-        frame = function_display_oscilloscope(frame, widthFrame, heightFrame, tabOscillographeDifferences)
-
-        cv.ShowImage("Window", frame)        
-        cv.ShowImage("winTestChart",imgT)
-       
-        '''
-        If you press 'm' again it will restart the measurements and replace the existing figure and txt
-        files from the previous session.
-        '''
-
-        if k_pressed == ord('q'):#cv.WaitKey(10) == 113: # if the letter 'q' is pressed then we quit.
+        if k_pressed == ord('q'):
             print 'Il faut sortir maintenant, faut pas rester ici.'
             break
 
@@ -268,7 +156,7 @@ def funGetResponseCurve(camera, widthF, heightF, sub_rec1, sub_rec2):
             cv.ShowImage("winTestChart",imgT)    
             #testChartName = 'imTestChart_'+repr(level)+'_'+repr(searchLevel)+'.png'
             testChartName = 'imTestChart_'+repr(level)+'_'+repr(searchLevel)+'.jpg'
-            cv.SaveImage(dirToSaveWebcamFrame+testChartName, imgT)
+            cv.SaveImage('./'+testChartName, imgT)
             cv.ShowImage("winTestChart",imgT)
             cv.WaitKey(10)
 
@@ -331,7 +219,7 @@ def funGetResponseCurve2(camera, levelContinuous, levelHaltone, widthF, heightF,
         cv.ShowImage("winTestChart",imgT)    
         #testChartName = 'imTestChart_'+repr(searchLevel)+'_'+repr(searchLevel)+'.png'
         testChartName = 'imTestChart_'+repr(searchLevel)+'_'+repr(searchLevel)+'.jpg'
-        cv.SaveImage(dirToSaveWebcamFrame+testChartName, imgT)
+        cv.SaveImage('./'+testChartName, imgT)
         cv.ShowImage("winTestChart",imgT)
         cv.WaitKey(10)
 
@@ -497,143 +385,27 @@ def function_get_response_curve_from_human(widthF,heightF):
 
     return tabSelectedLevel
 
-def funGetRatioByChannel(camera, widthF, heightF, sub_rec1, sub_rec2, valLevelBasis, valLevelTarget):
-    '''
-    Get the data to compute later the ratio.
-    '''
-    global tabOscillographeDifferences
-       
-    # intialiaze some stuffs
-    tabResultDifferenceRGBL = np.zeros((3,np.size(vecSearchLevelExp3)))
-    tabResultDifferenceRGBY = np.zeros((3,np.size(vecSearchLevelExp3)))
-    tabResultBasisY  = np.zeros((3,np.size(vecSearchLevelExp3)))
-    tabResultTargetY = np.zeros((3,np.size(vecSearchLevelExp3)))
-
-    print vecSearchLevelExp3
-    for ii in np.arange(0,3):
-        # start on channel
-        counterSearchLevel = 0
-        for level in vecSearchLevelExp3:
-            # Here I create a testchart for the blue channel
-            if ii == 0:
-                levelStep = np.array([valLevelBasis[0], valLevelBasis[1], level])
-            elif ii == 1:
-                levelStep = np.array([valLevelBasis[0], level, valLevelBasis[2]])
-            elif ii == 2:
-                levelStep = np.array([level, valLevelBasis[1], valLevelBasis[2]])
-            else:
-                print 'You are going too far.'
-
-            imgTestchart  = imCreateTestchartPatchBase(valLevelTarget,levelStep)
-            imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,3)
-            imgT          = cv.fromarray(imgTestchart)
-            testChartName = 'imTestChartRatioBlue_'+repr(level)+'.jpg'
-            cv.ShowImage("winTestChart",imgT)
-            cv.SaveImage(dirToSaveWebcamFrame+testChartName, imgT)
-            cv.WaitKey(10)
-
-            # I display the stream again
-            timer = 0
-            while timer < max_number_frame_to_wait_between_measurement:
-                frame = cv.QueryFrame(camera)
-                frame, dL, dLab, LabT, LabB, dY, XYZT, XYZB, dRGB = function_display_live_information(frame, widthF, heightF, sub_rec1, sub_rec2)
-                    
-                # Here we do something to display data difference as an osilloscope
-                tabOscillographeDifferences[:,0:-1] = tabOscillographeDifferences[:,1:]
-                tabOscillographeDifferences[:,-1]   = [dL, dLab, dY, dRGB]
-                frame = function_display_oscilloscope(frame, widthF, heightF, tabOscillographeDifferences)
-                cv.ShowImage("Window", frame)
-                timer = timer +1
-                        
-                cv.WaitKey(10)
-                #if timer == max_number_frame_to_wait_between_measurement:
-                    # Here I save the image taken by the webcam
-                    #funCaptureImage('frameFor_'+testChartName,frame, dirToSaveWebcamFrame)
-
-                # And here we save the differences. We will use them for computing the various ratio
-                tabResultDifferenceRGBL[ii, counterSearchLevel]   = dL  # Here we save the difference
-                tabResultDifferenceRGBY[ii, counterSearchLevel]   = dY  # Here we save the difference
-
-                tabResultTargetY[ii, counterSearchLevel]   = LabT[0]      # Here we save the measured intensity
-                tabResultBasisY[ii, counterSearchLevel]    = LabB[0]      # Here we save the measured intensity
-            
-            counterSearchLevel = counterSearchLevel + 1
-                
-    return frame, tabResultDifferenceRGBY, tabResultDifferenceRGBL, tabResultTargetY, tabResultBasisY
-
-def funGetRatioByChannel2(camera, widthF, heightF, sub_rec1, sub_rec2):
-    '''
-    Get the data to compute later the ratio. But this time we do it smarter. We first
-    display some maximum Red, Blue and Green and we get an idea of the maximum of basis 
-    value we can use for the search of Target = Basis.
-    '''
-    global tabOscillographeDifferences
-    valLevelBasis = 0
-    valLevelTarget = 0
-       
-    # intialiaze some stuffs
-    tabConfig = np.array([[0,0,255],[0,255,0],[255,0,0],[255,255,255]])
-    tabMaxIntensityMaxRGBY = np.zeros((1,4))
-    tabResultDifferenceRGBL = np.zeros((1,4))#np.zeros((3,np.size(vecSearchLevelExp3)))
-    tabResultDifferenceRGBY = np.zeros((1,4))#np.zeros((3,np.size(vecSearchLevelExp3)))
-    tabResultBasisY  = np.zeros((3,np.size(vecSearchLevelExp3)))
-    tabResultTargetY = np.zeros((3,np.size(vecSearchLevelExp3)))
-    print tabResultDifferenceRGBL, np.shape(tabResultDifferenceRGBL)
-
-    # first we display only the primaries, each one alone and we deduce the maximum
-    for ii in np.arange(0,4):
-        print tabConfig[ii,:], ii
-        imgT = cv.fromarray(imCreateTestChartSingleColor(tabConfig[ii,:]))
-        cv.ShowImage("winTestChart",imgT)
-        cv.WaitKey(20)
-
-        timer = 0
-        while timer < max_number_frame_to_wait_between_measurement:
-            frame = cv.QueryFrame(camera)
-            frame, dL, dLab, LabT, LabB, dY, XYZT, XYZB, dRGB = function_display_live_information(frame, widthF, heightF, sub_rec1, sub_rec2)
-                        
-            # Here we do something to display data difference as an osilloscope
-            tabOscillographeDifferences[:,0:-1] = tabOscillographeDifferences[:,1:]
-            tabOscillographeDifferences[:,-1]   = [dL, dLab, dY, dRGB]
-            frame = function_display_oscilloscope(frame, widthF, heightF, tabOscillographeDifferences)
-            cv.ShowImage("Window", frame)
-            timer = timer +1
-            print timer
-                            
-        cv.WaitKey(10)
-        tabResultDifferenceRGBL[0,ii]  = dL      # Here we save the difference
-        tabResultDifferenceRGBY[0,ii]  = dY      # Here we save the difference
-        tabMaxIntensityMaxRGBY[0,ii]   = (LabT[0] + LabB[0]) / 2.     # Here we save the measured intensity
-
-
-    print 'L difference: ',tabResultDifferenceRGBL
-    print 'Y difference: ',tabResultDifferenceRGBY
-    print 'max L RGB: ', tabMaxIntensityMaxRGBY
-                
-    return frame, tabResultDifferenceRGBY, tabResultDifferenceRGBL, tabResultTargetY, tabResultBasisY
-
 def funComputeResponseCurveFromMeasurement(tabMeasurement, vectorLevel, vectorSearchLevel):
     '''
     The function does some processing like interpolation on the obtained curves, this to
     find the local minima corresponding to the search value for a given digital input.
+
+    It also display curves as figure and save them.
+
+    Args:
+        tabMeasurement [floats]    : some intensity measurement Y or L 
+        vectorLevel [floats]       : n points for which we did the measurement
+        vectorSearchLevel [floats] : m > n points when we searched/measured the RC
+    
+    Ouptut:
+        responsecurve [float]      : n points corresponding to the RC
+
     '''
-    '''
-    # remove the offset:
-    print np.shape(vecSearchLevel)
-    print np.shape(tabMeasurement)
-    for ii in np.arange(0,np.size(vecLevel)):
-        offset = np.min(tabMeasurementContinuous[ii,:])
-        tabMeasurementContinuous[ii,:]=tabMeasurementContinuous[ii,:]-offset
-    '''    
-    #print 'measurement shape :',np.shape(tabMeasurement)
-    #print 'measurement  size :',np.shape(vecSearchLevel)
-    #print vecSearchLevel
-    #print tabMeasurement
-    #print 'vecLevel shape    :',np.shape(vecSearchLevel)
     
     # Some interpolation for the Y measurements of target and basis
     interpInput, interpM = funInterpolationSingleCurve(np.vstack([vectorSearchLevel,tabMeasurement]))
-    # and we normaliez the bazard
+    
+    # and we normalize the bazar
     interpM  = interpM  / np.max(interpM)
 
     # figure to show the search of equivalent intensity between the patches
@@ -701,67 +473,6 @@ def funPlotMeasurementCurves(interpInput, interpMC, interpMHT, vecInputRC, dataR
     plt.legend(loc=2)
     plt.draw()
     plt.savefig(figureName)
-
-def funComputeRatioFromExperiment(dataRatioRGBY, dataRatioRGBL, valLevelBasis, valLevelTarget, dataTargetY, dataBasisY, titleText, figureName):
-    '''
-    The function first first display the results.
-    Then it does some computations because computations are always good.
-    '''
-    # do some interpolation
-    interpInput, interpY       =  funInterpolationRatioDifferenceCurves(vecSearchLevelExp3, dataRatioRGBY)
-    interpInput, interpTargetY =  funInterpolationRatioDifferenceCurves(vecSearchLevelExp3, dataTargetY)
-    interpInput, interpBasisY  =  funInterpolationRatioDifferenceCurves(vecSearchLevelExp3, dataBasisY)
-    
-    # figure to show the search of equivalent intensity between the patches
-    fig = plt.figure()
-    yMin = 0
-    yMax = 4.2*np.max(interpTargetY)
-    #print yMax
-
-    # plot the differences and minimum
-    plt.plot(interpInput, interpY[0,:],'r-',label="Y difference Red ")
-    plt.plot(interpInput, interpY[1,:],'g-',label="Y difference Green")
-    plt.plot(interpInput, interpY[2,:],'b-',label="Y difference Blue")
-
-    # plot the measured intensity
-    plt.plot(interpInput, interpBasisY[0,:],'r--',label="Y Red + basis ")
-    plt.plot(interpInput, interpBasisY[1,:],'g--',label="Y Green + basis")
-    plt.plot(interpInput, interpBasisY[2,:],'b--',label="Y Blue + basis")
-
-    # plot the target patch who should stay stable
-    plt.plot(interpInput, interpTargetY[0,:],'k-',label="Y target for red ")
-    plt.plot(interpInput, interpTargetY[1,:],'k--',label="Y target for green")
-    plt.plot(interpInput, interpTargetY[2,:],'k-',label="Y target for blue")
-
-    # plot the minimum
-    minDiffInterpRGB, indRGB = funGetSomeMinimumSingleCurve(interpY)
-    plt.plot(indRGB[0], minDiffInterpRGB[0],'r^')
-    plt.plot(indRGB[1], minDiffInterpRGB[1],'g^')
-    plt.plot(indRGB[2], minDiffInterpRGB[2],'b^')
-    plt.vlines(indRGB[0],0,minDiffInterpRGB[0], colors='r',linestyles='--')
-    plt.vlines(indRGB[1],0,minDiffInterpRGB[1], colors='g',linestyles='--')
-    plt.vlines(indRGB[2],0,minDiffInterpRGB[2], colors='b',linestyles='--')
-
-    # plot the experiment information
-    plt.vlines(valLevelBasis[0], yMin, yMax, colors='k', linestyles='--', label='Basis')
-    plt.vlines(valLevelTarget, yMin, yMax, colors='k', linestyles='--', label='Target')
-    plt.text(valLevelBasis[0], yMax*0.9,'Basis = '+repr(valLevelBasis[0]), ha="center",bbox = dict(boxstyle='round', fc="w", ec="k"))
-    plt.text(valLevelTarget, yMax*0.9,'Target = '+repr(valLevelTarget), ha="center",bbox = dict(boxstyle='round', fc="w", ec="k"))
-
-    plt.ylabel('Difference in Y')
-    plt.xlabel('Digital input')
-    plt.xlim(0,255)
-    plt.title('Difference Curve for Ratio')
-    plt.ylim(yMin, yMax)
-    plt.title(titleText)
-    #plt.legend(loc=2)
-    plt.draw()
-    plt.savefig(figureName)
-
-    print 'youou!!!'
-    # I do nothing to start.
-    ratioRGB = [indRGB[0], indRGB[1], indRGB[2]]
-    return ratioRGB
 
 def funPlotOneResponseCurves(vecInput, responseCurve1, methodName, figureName):
     '''
@@ -864,7 +575,7 @@ def funDisplayDifferenceCurveIn3D(vecDigitLevel, inputData_x, dataToDisplay_y, x
     plt.draw()
     plt.savefig(figureName)# dirToSaveResults+prefixName+'_c1_2.png')
 
-def funComputeFittedResponseCurve(responseCurve, vec_meas_curve, data_stellar):
+def funComputeFittedResponseCurve(responseCurve, vec_meas_curve):#, data_stellar):
     '''
     The function takes the points from the computed response curve and fit a curve to get something who look like
     a gamma kind of shape
@@ -904,11 +615,11 @@ def funComputeFittedResponseCurve(responseCurve, vec_meas_curve, data_stellar):
     # OR WE DO IT LIKE THIS:
     estimated_param, err_estim = curve_fit(funSuperFittFunction, x, y_meas, p0)
     fitted_Response_Curve2 = peval(x,estimated_param)
-    print 'Hammer time----------------------------------------'
-    print 'ICI REGARDE'
-    print 'curve fit',estimated_param, np.shape(estimated_param)
-    print 'lseastsq', plsq[0], np.shape(plsq[0])
-    print 'Hammer time----------------------------------------'
+    #print 'Hammer time----------------------------------------'
+    #print 'ICI REGARDE'
+    #print 'curve fit',estimated_param, np.shape(estimated_param)
+    #print 'lseastsq', plsq[0], np.shape(plsq[0])
+    #print 'Hammer time----------------------------------------'
     #fitted_Response_Curve = funSuperFittFunction(x, estimated_param)
 
     guess_start_curve = peval(x,p0)
@@ -924,8 +635,8 @@ def funComputeFittedResponseCurve(responseCurve, vec_meas_curve, data_stellar):
     plt.plot(x,guess_start_curve,'k',label='guess start')
     plt.plot(x,gamma22,'r',label='gamma 2.2')
     plt.plot(x,y_meas,'g.-', label ='measurement')
-    print np.shape(data_stellar)
-    plt.plot(data_stellar[:,0], data_stellar[:,1],'.-k',label='Spectro')
+    #print np.shape(data_stellar)
+    #plt.plot(data_stellar[:,0], data_stellar[:,1],'.-k',label='Spectro')
 
     A_par, B_par, alpha_par, beta_par = plsq[0]
     print A_par, B_par, alpha_par, beta_par
@@ -943,73 +654,57 @@ def funComputeFittedResponseCurve(responseCurve, vec_meas_curve, data_stellar):
 
     return fitted_Response_Curve, plsq[0]
 
-def funGiveMeTheRatio(ratio_RGB, basisRGB, parameters_gamma_curve):
-    '''
-    This function finally does things.
-    We d0 -> Y_color_Channel_relative - Y_color_basis
-    '''
-    # get effective values from the RC curve function
-    A, B, alpha, beta = parameters_gamma_curve
-    Y_R_relatif = funSuperFittFunction(ratio_RGB[0], A, B, alpha, beta)
-    Y_B_relatif = funSuperFittFunction(ratio_RGB[1], A, B, alpha, beta)
-    Y_G_relatif = funSuperFittFunction(ratio_RGB[2], A, B, alpha, beta)
-    Y_Basis_relatif = funSuperFittFunction(basisRGB, A, B, alpha, beta)
-    ratio_GR =  (Y_G_relatif - Y_Basis_relatif) / (Y_R_relatif - Y_Basis_relatif)
-    ratio_GB = (Y_G_relatif - Y_Basis_relatif) / (Y_B_relatif - Y_Basis_relatif)
-
-    print 'Some results----------------------------- below by our method'
-    print 'pure R '+str(ratio_RGB[0])+' give Y R relative of '+str(Y_R_relatif)
-    print 'pure G '+str(ratio_RGB[1])+' give Y R relative of '+str(Y_G_relatif)
-    print 'pure B '+str(ratio_RGB[2])+' give Y R relative of '+str(Y_B_relatif)
-    print 'pure Basis '+str(basisRGB)+' give Y R relative of '+str(Y_Basis_relatif)
-    print 'ratio GR: ', ratio_GR
-    print 'ratio GB: ', ratio_GB    
-    return Y_R_relatif, Y_G_relatif, Y_B_relatif, ratio_GR, ratio_GB
-
-def funGiveMeTheRatioBySpectro(ratio_RGB, basisRGB, data_response_curve_stellar):
-    '''
-    This function finally does things.
-    We d0 -> Y_color_Channel_relative - Y_color_basis
-    '''
-    # get effective values from the RC curve function by linear interpolation
-    Y_R_relatif = np.interp(ratio_RGB[0], data_response_curve_stellar[:,0], data_response_curve_stellar[:,1])
-    Y_B_relatif = np.interp(ratio_RGB[1], data_response_curve_stellar[:,0], data_response_curve_stellar[:,1])
-    Y_G_relatif = np.interp(ratio_RGB[2], data_response_curve_stellar[:,0], data_response_curve_stellar[:,1])
-    Y_Basis_relatif = np.interp(basisRGB, data_response_curve_stellar[:,0], data_response_curve_stellar[:,1])
-    ratio_GR =  (Y_G_relatif - Y_Basis_relatif) / (Y_R_relatif - Y_Basis_relatif)
-    ratio_GB = (Y_G_relatif - Y_Basis_relatif) / (Y_B_relatif - Y_Basis_relatif)
-
-    # get effective values from the RC curve by Stellare device
-
-    print 'Some results----------------------------- below by Stellar'
-    print 'pure R '+str(ratio_RGB[0])+' give Y R relative of '+str(Y_R_relatif)
-    print 'pure G '+str(ratio_RGB[1])+' give Y R relative of '+str(Y_G_relatif)
-    print 'pure B '+str(ratio_RGB[2])+' give Y R relative of '+str(Y_B_relatif)
-    print 'pure Basis '+str(basisRGB)+' give Y R relative of '+str(Y_Basis_relatif)
-    print 'ratio GR: ', ratio_GR
-    print 'ratio GB: ', ratio_GB    
-    return Y_R_relatif, Y_G_relatif, Y_B_relatif, ratio_GR, ratio_GB
-
 def main():
     ''' Here the trouble start.
     '''
-
-    global selectExperiment_1
-    global selectExperiment_2
-    global selectExperiment_3
-    global selectExperiment_5
     global prefixName
     global configMeasurement
     global vecSearchLevel 
     global vecLevel
     global sizeTilePatchHT
     global stepVecSearch
-    global vecSearchLevelExp3
-    #global dirToSaveWebcamFrame
 
-    vecSearchLevel = np.round(np.hstack((np.arange(0,255, stepVecSearch), 255)))
-    
+    # do the measurement
     funDisplayWebcamAndTakePictures(number_camera)
+    print 'The measurement sessions is closed.'
+    print 'Now we process the data'
+
+    # LOAD the saved measurement for Method 1:
+    dataDiff = np.loadtxt(dirToSaveResults+prefixName+'_diffRC_L.txt')   
+    
+    # COMPUTE the response curve (RC) using Method 1:
+    responseCurve1 = funComputeResponseCurveFromMeasurement(dataDiff, vecLevel, vecSearchLevel)
+
+    # SAVE the data
+    np.savetxt(dirToSaveResults+prefixName+'_RC_final1.txt', (responseCurve1),fmt='%03.2f')  
+
+    #  LOAD the saved measurement for Method 2: 
+    dataContinuous = np.loadtxt(dirToSaveResults+prefixName+'_ContinuousRC_L.txt')
+    dataHalftone   = np.loadtxt(dirToSaveResults+prefixName+'_HalftoneRC_L.txt')
+    dataDiff       = np.loadtxt(dirToSaveResults+prefixName+'_diffContinuousHalftone_L.txt')
+    
+    # COMPUTE the RC using Method 2:
+    responseCurveContinuous, responseCurveHaltone, responseCurve2 = funComputeResponseCurveFromMeasurementExp2(dataContinuous, dataHalftone, vecSearchLevel)
+
+    # SAVE the data
+    np.savetxt(dirToSaveResults+prefixName+'_RC_continuous.txt', (responseCurveContinuous),fmt='%03.2f')
+    np.savetxt(dirToSaveResults+prefixName+'_RC_halftone.txt', (responseCurveHaltone),fmt='%03.2f')        
+    np.savetxt(dirToSaveResults+prefixName+'_RC_final2.txt', (responseCurve2),fmt='%03.2f')  
+
+    # WE DO MORE to fit some curve with expected RC shape:
+    dataResponseCurve = np.loadtxt(dirToSaveResults+prefixName+'_RC_final2.txt')  
+    fittedResponseCurve, parameters_gamma = funComputeFittedResponseCurve(dataResponseCurve, vecSearchLevel)
+    np.savetxt(dirToSaveResults+prefixName+'_RC_final_fitted.txt', (responseCurve2),fmt='%03.2f') 
+    np.savetxt(dirToSaveResults+prefixName+'_param_gamma_curve.txt', (parameters_gamma),fmt='%03.2f') 
+    print 'res points fitted curve:',fittedResponseCurve 
+    print 'res param gamma curve:', parameters_gamma 
+
+    # LAST BUT NOT LEAST we display RC by both methods:
+    funPlotTwoResponseCurves(vecLevel, responseCurve1, vecSearchLevel, responseCurve2, 'The two methods together')
+    
+    plt.show()
+
 
 main()  
 print 'well done, you reach the biggest achievement of your day, or maybe the second, not bad.'
+  
