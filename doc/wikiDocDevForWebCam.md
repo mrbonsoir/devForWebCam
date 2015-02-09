@@ -41,24 +41,13 @@ and you can tune the position of you camera Vs projector and projection surface.
 
 # What to do next?
 
-Now it is time to do measurement! The moment you were waiting for an eternity. Your camera is in place, you just need to use the *setupFindResponseCurveAndRatio.py* program. This code allows you to do the several things. These things are presented in the command window when you launch it doing:
+Now it is time to do measurement! The moment you were waiting for an eternity. Your camera is in place, you just need to use the *computeResponseCurveWithWebcam.py* program. This code allows you to start communication with the webcam and then do measurement. The beginning of the file is for seting up parameters, basically the steps for incrementing the ramp level in orde to sample the RC.
 
 ```
-python setupFindCResponseCurveAndRatio.py [name_test] [size_tile_patch_HT] [step_vector_search bool_experiment] [camera_number]
+python computeResponseCurveWithWebcam.py
 ```
 
-and if you write 
+This Python file is running two different methods to estimate the RC. One is called Method 1 and the second Method 2.
 
-```
-python setupFindCResponseCurveAndRatio.py help
-```
-
-you should get some info about the input parameters.
-
-But basically you can:
-
-- measure response curve with the webcam
-	- a slow version
-	- a faster version
-	- a human feedback version
-- measure the ratio by channel
+- Method 1 is comparing for every ramp step in its halftoned version a ramp of continuous tone.
+- Methos 2 is smarter. Less images are taken and the process is supposed to be faster.
