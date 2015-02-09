@@ -41,7 +41,11 @@ and you can tune the position of you camera Vs projector and projection surface.
 
 # What to do next?
 
-Now it is time to do measurement! The moment you were waiting for an eternity. Your camera is in place, you just need to use the *computeResponseCurveWithWebcam.py* program. This code allows you to start communication with the webcam and then do measurement. The beginning of the file is for seting up parameters, basically the steps for incrementing the ramp level in orde to sample the RC.
+Now it is time to do measurement! 
+
+## Cyborg approach
+
+The moment you were waiting for an eternity. Your camera is in place, you just need to use the *computeResponseCurveWithWebcam.py* program. This code allows you to start communication with the webcam and then do measurement. The beginning of the file is for seting up parameters, basically the steps for incrementing the ramp level in orde to sample the RC.
 
 ```
 python computeResponseCurveWithWebcam.py
@@ -51,3 +55,7 @@ This Python file is running two different methods to estimate the RC. One is cal
 
 - Method 1 is comparing for every ramp step in its halftoned version a ramp of continuous tone.
 - Methos 2 is smarter. Less images are taken and the process is supposed to be faster.
+
+## The good old human fashion way
+
+Eventually you want to compare the cyborg way with the human way. That is what this other code is trying to do. Instead of leting the programm deciding when the two patches side by side are equivalent in intensity, you are now in charge and you decide by increasing of decreasing the halftone patch value while the continuous remains at a fixed ramp value. 
