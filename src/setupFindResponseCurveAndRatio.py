@@ -389,6 +389,17 @@ def function_get_response_curve_from_human(widthF,heightF):
         tabResultsContinousL      : array (float [floats]) of size 1 x size(vecSearchLevel)
         tabResultsHalftoneL       : array (float [floats]) of size 1 x size(vecSearchLevel)
         
+
+    pseudo code:
+    display testChart 
+        increase level in blue channel until satisfying
+            go to next channel
+        increase level in red channel until satisfying
+            go to next channel 
+        increase level in green channel until satisfying
+            go to next round and restart with new ref and basis value
+
+
     '''
     global vecLevel
     global vecSearchLevel
