@@ -154,7 +154,7 @@ def funDisplayWebcamAndTakePictures(number_camera):
     print 'If you press theses keys 1, 2, 3, 4 or q then this will happend:'
     print '1 -> measurement starts according to your input parameter when calling the program.'
     print '2 -> same as 1 but faster where ramp of both continuous and haltoned patched are measured.'
-    print '3 -> try to recover the ration single channel vers grey.'
+    print '3 -> try to recover the ratio single channel vers grey.'
     print '4 -> here we suppose to get the maximum intensity per color channel.'
     print '5 -> here we do like in 1 or 2 but we ask a user to give his feedback.'
     print 'q -> is for Quit.'
@@ -1142,7 +1142,7 @@ def main():
 
         Y_R_rel, Y_G_rel, Y_B_rel, ratio_GR, ratio_GB = funGiveMeTheRatio(ratioRGB2, vecLevelBasis2[0], parameters_gamma)
         dataRatio2 = np.hstack([Y_R_rel, Y_G_rel, Y_B_rel, ratio_GR, ratio_GB])
-        np.savetxt(dirToSaveResults+prefixName+'_final_ration_2.txt', (dataRatio),fmt='%03.2f')        
+        np.savetxt(dirToSaveResults+prefixName+'_final_ratio_2.txt', (dataRatio),fmt='%03.2f')        
         Y_R_rel, Y_G_rel, Y_B_rel, ratio_GR, ratio_GB = funGiveMeTheRatioBySpectro(ratioRGB2, vecLevelBasis[0], dataRCbyStellar)
 
     plt.show()

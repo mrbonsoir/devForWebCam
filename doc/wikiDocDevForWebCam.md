@@ -41,7 +41,7 @@ and you can tune the position of you camera Vs projector and projection surface.
 
 # What to do next?
 
-Now it is time to do measurement! 
+Now it is time to do measurement! And we start with the response curve also called RC.
 
 ## Cyborg approach
 
@@ -58,4 +58,23 @@ This Python file is running two different methods to estimate the RC. One is cal
 
 ## The good old human fashion way
 
-Eventually you want to compare the cyborg way with the human way. That is what this other code is trying to do. Instead of leting the programm deciding when the two patches side by side are equivalent in intensity, you are now in charge and you decide by increasing of decreasing the halftone patch value while the continuous remains at a fixed ramp value. 
+Eventually you want to compare the cyborg way with the human way. That is what this other code is trying to do. Instead of letting the programm deciding when the two patches side by side are equivalent in intensity, you are now in charge and you decide by increasing of decreasing the halftone patch value while the continuous one remains at a fixed ramp value. 
+
+To run this code do this:
+
+```
+python computeResponseCurveWithHumanEye.py
+```
+
+Again, eventually, you may want to compare these different approaches to measure the same *thing*. Another script may be uesd where the save data will be loaded and displayed in the same figure window.
+
+## Ratio between color channel, a cyborg approach
+
+We are getting closer to the purpose of all this mess. The idea is/was to evaluate a ratio in intensity between red and green, blue and green. To do so we compare grayscale continuous patch Vs lower level of grayscale patch where we slowly increase only one of the three color channel. Which means that at the end of this experiment we have three combinations of similar amount of gray plus a bit more of one of the color channel equivalent to a reference grayscale level. Then magic and equation are joining the party to establish these ratios. We may need the RC previously measured.
+
+To run the code to measure the ratio with webcam run the following code:
+
+```
+python computeRatioWithWebcam.py
+```
+where you may have to tune the parameters in the file
