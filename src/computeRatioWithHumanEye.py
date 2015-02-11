@@ -117,24 +117,15 @@ def funDisplayWebcamAndTakePictures(number_camera):
         # Here I start the loop for one channel as we did for CIC in 2012-------------------------------------
         k_pressed = cv.WaitKey(10)
         if k_pressed == ord("s"): # start the measurement if s is pressed
-            frame, tabDiffRGBY, tabDiffRGBL, tabResTargetY, tabResBasisY = fun_Get_Ratio_By_Channel_By_Human(camera, widthFrame, heightFrame, sub_rec1, sub_rec2, vecLevelBasis, vecLevelTarget)
+            val_selected_value_by_human1 = fun_Get_Ratio_By_Channel_By_Human(camera, widthFrame, heightFrame, sub_rec1, sub_rec2, vecLevelBasis, vecLevelTarget)
             
-            # save all the measurement as text
-            np.savetxt(dirToSaveResults+prefixName+'_diffRatioRGB_L.txt', (tabDiffRGBL),fmt='%03.2f')
-            np.savetxt(dirToSaveResults+prefixName+'_diffRatioRGB_Y.txt', (tabDiffRGBY),fmt='%03.2f')        
-            np.savetxt(dirToSaveResults+prefixName+'_diffResTarget_Y.txt', (tabResTargetY),fmt='%03.2f')        
-            np.savetxt(dirToSaveResults+prefixName+'_diffResBasis_Y.txt', (tabResBasisY),fmt='%03.2f')        
+            np.savetxt(dirToSaveResults+prefixName+'_valSelected1.txt', (val_selected_value_by_human1),fmt='%03.2f')        
 
             # And we do it again
             print 'Same player with different input for basis and target'
-            frame, tabDiffRGBY, tabDiffRGBL, tabResTargetY, tabResBasisY = fun_Get_Ratio_By_Channel_By_Human(camera, widthFrame, heightFrame, sub_rec1, sub_rec2, vecLevelBasis2, vecLevelTarget2)
+            val_selected_value_by_human2 = fun_Get_Ratio_By_Channel_By_Human(camera, widthFrame, heightFrame, sub_rec1, sub_rec2, vecLevelBasis2, vecLevelTarget2)
             
-            # save all the measurement as text
-            np.savetxt(dirToSaveResults+prefixName+'_diffRatioRGB_L2.txt', (tabDiffRGBL),fmt='%03.2f')
-            np.savetxt(dirToSaveResults+prefixName+'_diffRatioRGB_Y2.txt', (tabDiffRGBY),fmt='%03.2f')        
-            np.savetxt(dirToSaveResults+prefixName+'_diffResTarget_Y2.txt', (tabResTargetY),fmt='%03.2f')        
-            np.savetxt(dirToSaveResults+prefixName+'_diffResBasis_Y2.txt', (tabResBasisY),fmt='%03.2f')        
-
+            np.savetxt(dirToSaveResults+prefixName+'_valSelected2.txt', (val_selected_value_by_human2),fmt='%03.2f')        
 
         if k_pressed == ord('q'):
             print 'Il faut sortir maintenant, faut pas rester ici.'
@@ -143,7 +134,10 @@ def funDisplayWebcamAndTakePictures(number_camera):
     # and the function does return nothing as every measurement are saved in a text file.        
     #return tabDiffL
 
-def fun_Get_Ratio_By_Channel_By_Human(camera, widthFrame, heightFrame, sub_rec1, sub_rec2, vecLevelBasis, vecLevelTarget):
+def fun_Get_Ratio_By_Channel_By_Human(camera, 
+                                      width_frame, height_frame, 
+                                      sub_rec1, sub_rec2, 
+                                      vecLevelBasis, vecLevelTarget):
     '''
     The function does like the function funGetRatioByChannel. Only difference is it asks
     a humna observer to decide if two levels are equivalent in intensity.
@@ -158,7 +152,7 @@ def fun_Get_Ratio_By_Channel_By_Human(camera, widthFrame, heightFrame, sub_rec1,
         sub_rec2: not needed
 
     Output:
-        frame: an image  
+        val_selected_value_by_human (array) : 1 x 3
 
         one value by color channel that tells where for which level there is equivalence
     '''
@@ -168,16 +162,10 @@ def fun_Get_Ratio_By_Channel_By_Human(camera, widthFrame, heightFrame, sub_rec1,
     global tabOscillographeDifferences
     global max_number_frame_to_wait_between_measurement
 
-    # imitialize some parameters
-    tabSelectedLevel   = np.zeros((1,np.size(vecSearchLevel)))
-    counterSearchLevel = 0
-
-    # intialiaze some stuffs
-    tabResultDifferenceRGBL = np.zeros((3,np.size(vecSearchLevel)))
-    tabResultDifferenceRGBY = np.zeros((3,np.size(vecSearchLevel)))
-    tabResultBasisY  = np.zeros((3,np.size(vecSearchLevel)))
-    tabResultTargetY = np.zeros((3,np.size(vecSearchLevel)))
-
+    # initialize some parameters
+    tabSelectedLevel   = np.zeros((1,3))
+        
+    # create first testchart
     levelStep     = np.array([vecLevelBasis[0], vecLevelBasis[1], vecLevelBasis[2]])
     imgTestchart  = imCreateTestchartPatchBase(vecLevelTarget, levelStep)
     imgT          = cv.CreateImage((widthFrame,heightFrame), cv.IPL_DEPTH_8U,3)
@@ -192,46 +180,144 @@ def fun_Get_Ratio_By_Channel_By_Human(camera, widthFrame, heightFrame, sub_rec1,
     print 'a/s  down to decrease the level -1/-10.'
     print 'n to go to the next channel.'
 
-    # initialize the search value
     searchLevelC = vecLevelBasis[0]
-
+    # find the blue value    
     while True:
-            k_pressed = cv.WaitKey(5)
-            # if keystroke pressed is 'q' then level up
-            if k_pressed == ord('q'):
-                searchLevelC = searchLevelC + 1
-                if searchLevelC > 255:
-                    searchLevelC = 255
-                print 'level up '+str(searchLevelC)
-                imgTestchart  = imCreateTestchartPatchBase(vecLevelTarget,[searchLevelC, vecLevelBasis[1], vecLevelBasis[2]])
-                imgT          = cv.CreateImage((widthFrame,heightFrame), cv.IPL_DEPTH_8U,3)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
+        k_pressed = cv.WaitKey(5)
+        
+        if k_pressed == ord('q'):
+            searchLevelC = searchLevelC + 1
+            if searchLevelC > 255:
+                searchLevelC = 255
+            print 'level up '+str(searchLevelC)
 
-            # if keystroke pressed is 'q' then level up
-            if k_pressed == ord('a'):
-                searchLevelC = searchLevelC - 1
-                if searchLevelC < 0:
-                    searchLevelC = 0
-                print 'level down '+str(searchLevelC)
-                imgTestchart  = imCreateTestchartPatchBase(vecLevelTarget,[searchLevelC, vecLevelBasis[1], vecLevelBasis[2]])
-                imgT          = cv.CreateImage((widthFrame,heightFrame), cv.IPL_DEPTH_8U,3)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
+        if k_pressed == ord('w'):
+            searchLevelC = searchLevelC + 10
+            if searchLevelC > 255:
+                searchLevelC = 255
+            print 'level up '+str(searchLevelC)
 
-            #if keystroke presses is n for "next" then next level
-            elif k_pressed == ord('n'):
-                tabSelectedLevel[0,counterSearchLevel] = searchLevelC # Here we save the Luminance of the left patch alone
-                counterSearchLevel = counterSearchLevel + 1
-                break
+        if k_pressed == ord('a'):
+            searchLevelC = searchLevelC - 1
+            if searchLevelC < 0:
+                searchLevelC = 0
+            print 'level down '+str(searchLevelC)
 
-    print 'result by human observer:'
-    print vecSearchLevel
-    print tabSelectedLevel
+        if k_pressed == ord('s'):
+            searchLevelC = searchLevelC - 10
+            if searchLevelC < 0:
+                searchLevelC = 0
+            print 'level up '+str(searchLevelC)
+
+        #if keystroke presses is n for "next" then next level
+        elif k_pressed == ord('n'):
+            tabSelectedLevel[0,0] = searchLevelC # Here we save the Luminance of the left patch alone
+
+            print 'We are over with the blue channel.'
+            imgTestchart  = imCreateTestchartPatchBase(vecLevelTarget, [vecLevelBasis[0], vecLevelBasis[1], vecLevelBasis[2]])
+            imgT          = cv.CreateImage((width_frame, height_frame), cv.IPL_DEPTH_8U,3)
+            imgT          = cv.fromarray(imgTestchart)
+            cv.ShowImage("winTestChart",imgT)
+            break
+
+        imgTestchart  = imCreateTestchartPatchBase(vecLevelTarget, [searchLevelC, vecLevelBasis[1], vecLevelBasis[2]])
+        imgT          = cv.CreateImage((width_frame, height_frame), cv.IPL_DEPTH_8U,3)
+        imgT          = cv.fromarray(imgTestchart)
+        cv.ShowImage("winTestChart",imgT)
+
+    searchLevelC = vecLevelBasis[0]
+    # find the green value    
+    while True:
+        k_pressed = cv.WaitKey(5)
+        
+        if k_pressed == ord('q'):
+            searchLevelC = searchLevelC + 1
+            if searchLevelC > 255:
+                searchLevelC = 255
+            print 'level up '+str(searchLevelC)
+
+        if k_pressed == ord('w'):
+            searchLevelC = searchLevelC + 10
+            if searchLevelC > 255:
+                searchLevelC = 255
+            print 'level up '+str(searchLevelC)
+
+        if k_pressed == ord('a'):
+            searchLevelC = searchLevelC - 1
+            if searchLevelC < 0:
+                searchLevelC = 0
+            print 'level down '+str(searchLevelC)
+
+        if k_pressed == ord('s'):
+            searchLevelC = searchLevelC - 10
+            if searchLevelC < 0:
+                searchLevelC = 0
+            print 'level up '+str(searchLevelC)
+
+        #if keystroke presses is n for "next" then next level
+        elif k_pressed == ord('n'):
+            tabSelectedLevel[0,1] = searchLevelC
+
+            print 'We are over with the green channel.'
+            imgTestchart  = imCreateTestchartPatchBase(vecLevelTarget, [vecLevelBasis[0], vecLevelBasis[1], vecLevelBasis[2]])
+            imgT          = cv.CreateImage((width_frame, height_frame), cv.IPL_DEPTH_8U,3)
+            imgT          = cv.fromarray(imgTestchart)
+            cv.ShowImage("winTestChart",imgT)
+            break
+
+        imgTestchart  = imCreateTestchartPatchBase(vecLevelTarget, [vecLevelBasis[0], searchLevelC, vecLevelBasis[2]])
+        imgT          = cv.CreateImage((width_frame, height_frame), cv.IPL_DEPTH_8U,3)
+        imgT          = cv.fromarray(imgTestchart)
+        cv.ShowImage("winTestChart",imgT)
+
+    searchLevelC = vecLevelBasis[0]
+    # find the red value    
+    while True:
+        k_pressed = cv.WaitKey(5)
+        
+        if k_pressed == ord('q'):
+            searchLevelC = searchLevelC + 1
+            if searchLevelC > 255:
+                searchLevelC = 255
+            print 'level up '+str(searchLevelC)
+
+        if k_pressed == ord('w'):
+            searchLevelC = searchLevelC + 10
+            if searchLevelC > 255:
+                searchLevelC = 255
+            print 'level up '+str(searchLevelC)
+
+        if k_pressed == ord('a'):
+            searchLevelC = searchLevelC - 1
+            if searchLevelC < 0:
+                searchLevelC = 0
+            print 'level down '+str(searchLevelC)
+
+        if k_pressed == ord('s'):
+            searchLevelC = searchLevelC - 10
+            if searchLevelC < 0:
+                searchLevelC = 0
+            print 'level up '+str(searchLevelC)
+
+        elif k_pressed == ord('n'):
+            tabSelectedLevel[0,2] = searchLevelC
+
+            print 'We are over with the red channel.'
+            imgTestchart  = imCreateTestchartPatchBase(vecLevelTarget, [vecLevelBasis[0], vecLevelBasis[1], vecLevelBasis[2]])
+            imgT          = cv.CreateImage((width_frame, height_frame), cv.IPL_DEPTH_8U,3)
+            imgT          = cv.fromarray(imgTestchart)
+            cv.ShowImage("winTestChart",imgT)
+            break
+
+        imgTestchart  = imCreateTestchartPatchBase(vecLevelTarget, [vecLevelBasis[0], vecLevelBasis[1], searchLevelC])
+        imgT          = cv.CreateImage((width_frame, height_frame), cv.IPL_DEPTH_8U,3)
+        imgT          = cv.fromarray(imgTestchart)
+        cv.ShowImage("winTestChart",imgT)    
+
+
+    print 'result by human observer: ', tabSelectedLevel
 
     return tabSelectedLevel
-
-    return frame, tabDiffRGBY, tabDiffRGBL, tabResTargetY, tabResBasisY
 
 def funGetRatioByChannel(camera, widthF, heightF, sub_rec1, sub_rec2, valLevelBasis, valLevelTarget):
     '''
@@ -358,138 +444,6 @@ def funComputeRatioFromExperiment(dataRatioRGBY, dataRatioRGBL, valLevelBasis, v
     ratioRGB = [indRGB[0], indRGB[1], indRGB[2]]
     return ratioRGB
 
-def function_get_response_curve_from_human(widthF,heightF):
-    ''' The function does the same as funGetResponseCurve2 but instead of
-    asking the camera we ask a human user to do the job
-
-    Args:
-        camera: an image but actually I don't need it here 
-        levelContinuous: not needed
-        levelHaltone: not needed
-        widthF 
-        heightF 
-        sub_rec1: not needed
-        sub_rec2: not needed
-
-    Output:
-        frame: an image  
-        tabSelectedLevel: array (float [floats]) of size 1 x size(vecSearchLevel)
-
-        tabDiffContinuousHalftoneL: array (float [floats]) of size 1 x size(vecSearchLevel)
-        tabResultsContinousL      : array (float [floats]) of size 1 x size(vecSearchLevel)
-        tabResultsHalftoneL       : array (float [floats]) of size 1 x size(vecSearchLevel)
-        
-    '''
-    global vecLevel
-    global vecSearchLevel
-    global sizeTilePatchHT
-    global tabOscillographeDifferences
-    global max_number_frame_to_wait_between_measurement
-
-    # imitialize some parameters
-    tabSelectedLevel   = np.zeros((1,np.size(vecSearchLevel)))
-    counterSearchLevel = 0
-
-    # Some guidelines
-    print 'q up to increase the level.'
-    print 'a down to decrease the level.'
-    print 'n to go to the next level.'
-
-    for searchLevel in vecSearchLevel:
-        # Here I create a testchart
-        imgTestchart  = imCreateTestchartContinuousAndHalftoned(searchLevel, 0, sizeTilePatchHT)
-        imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
-        imgT          = cv.fromarray(imgTestchart)
-        cv.ShowImage("winTestChart",imgT)    
-
-        print 'level haltoning is '+str(searchLevel)
-        searchLevelC = 0
-
-        while True:
-            k_pressed = cv.WaitKey(5)
-            # if keystroke pressed is 'q' then level up
-            if k_pressed == ord('q'):
-                searchLevelC = searchLevelC + 1
-                if searchLevelC > 255:
-                    searchLevelC = 255
-                print 'level up '+str(searchLevelC)
-                imgTestchart  = imCreateTestchartContinuousAndHalftoned(searchLevel, searchLevelC, sizeTilePatchHT)
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
-
-            # if keystroke pressed is 'w' then level down
-            elif k_pressed == ord('w'):
-                print 'level down'
-                searchLevelC = searchLevelC + 10
-                if searchLevelC > 255:
-                    searchLevelC = 255
-                print 'level up '+str(searchLevelC)
-                imgTestchart  = imCreateTestchartContinuousAndHalftoned(searchLevel, searchLevelC, sizeTilePatchHT)
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
-
-            # if keystroke pressed is 'a' then level down
-            elif k_pressed == ord('a'):
-                print 'level down'
-                searchLevelC = searchLevelC - 1
-                if searchLevelC < 0:
-                    searchLevelC = 0
-                print 'level up '+str(searchLevelC)
-                imgTestchart  = imCreateTestchartContinuousAndHalftoned(searchLevel, searchLevelC, sizeTilePatchHT)
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
-            
-            # if keystroke pressed is 's' then level down
-            elif k_pressed == ord('s'):
-                print 'level down'
-                searchLevelC = searchLevelC - 10
-                if searchLevelC < 0:
-                    searchLevelC = 0
-                print 'level up '+str(searchLevelC)
-                imgTestchart  = imCreateTestchartContinuousAndHalftoned(searchLevel, searchLevelC, sizeTilePatchHT)
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
-
-            # if keystroke pressed is 'e' the size tile change up
-            elif k_pressed == ord('e'):
-                print 'patch size tile down'
-                sizeTilePatchHT = sizeTilePatchHT / 2
-                if sizeTilePatchHT < 16:
-                    sizeTilePatchHT = 16
-                print 'level up '+str(sizeTilePatchHT)
-                imgTestchart  = imCreateTestchartContinuousAndHalftoned(searchLevel, searchLevelC, sizeTilePatchHT)
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
-            
-            # if keystroke pressed is 'd' the size tile change down
-            elif k_pressed == ord('d'):
-                print 'patch size tile down'
-                sizeTilePatchHT = sizeTilePatchHT * 2
-                if sizeTilePatchHT > 512:
-                    sizeTilePatchHT = 512   
-                print 'level up '+str(sizeTilePatchHT)
-                imgTestchart  = imCreateTestchartContinuousAndHalftoned(searchLevel, searchLevelC, sizeTilePatchHT)
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
-
-            #if keystroke presses is n for "next" then next level
-            elif k_pressed == ord('n'):
-                tabSelectedLevel[0,counterSearchLevel] = searchLevelC # Here we save the Luminance of the left patch alone
-                counterSearchLevel = counterSearchLevel + 1
-                break
-
-    print 'result by human observer:'
-    print vecSearchLevel
-    print tabSelectedLevel
-
-    return tabSelectedLevel
-
 def main():
     ''' Here the trouble start.
     '''
@@ -505,22 +459,11 @@ def main():
     print 'The measurement sessions is closed.'
     print 'Now we process the data to get the ratios'
 
-    # LOAD the saved measurement for Method 1:
-    dataRatioRGB_L  = np.loadtxt(dirToSaveResults+prefixName+'_diffRatioRGB_L.txt')
-    dataRatioRGB_Y  = np.loadtxt(dirToSaveResults+prefixName+'_diffRatioRGB_Y.txt')
-    dataResTarget_Y = np.loadtxt(dirToSaveResults+prefixName+'_diffResTarget_Y.txt')        
-    dataResBasis_Y  = np.loadtxt(dirToSaveResults+prefixName+'_diffResBasis_Y.txt')        
-
-    dataRatioRGB_L2  = np.loadtxt(dirToSaveResults+prefixName+'_diffRatioRGB_L2.txt')
-    dataRatioRGB_Y2  = np.loadtxt(dirToSaveResults+prefixName+'_diffRatioRGB_Y2.txt')
-    dataResTarget_Y2 = np.loadtxt(dirToSaveResults+prefixName+'_diffResTarget_Y2.txt')        
-    dataResBasis_Y2  = np.loadtxt(dirToSaveResults+prefixName+'_diffResBasis_Y2.txt')        
-
     # COMPUTE the response curve (RC) using Method 1:
-    ratioRGB1 = funComputeRatioFromExperiment(dataRatioRGB_Y, dataRatioRGB_L, vecLevelBasis, vecLevelTarget, dataResTarget_Y, dataResBasis_Y, 'config 1', dirToSaveResults+prefixName+'_ratio_Y1.png')
-    ratioRGB2 = funComputeRatioFromExperiment(dataRatioRGB_Y2, dataRatioRGB_L2, vecLevelBasis2, vecLevelTarget2, dataResTarget_Y2, dataResBasis_Y2, 'config 2', dirToSaveResults+prefixName+'_ratio_Y2.png')
+    #ratioRGB1 = funComputeRatioFromExperiment(dataRatioRGB_Y, dataRatioRGB_L, vecLevelBasis, vecLevelTarget, dataResTarget_Y, dataResBasis_Y, 'config 1', dirToSaveResults+prefixName+'_ratio_Y1.png')
+    #ratioRGB2 = funComputeRatioFromExperiment(dataRatioRGB_Y2, dataRatioRGB_L2, vecLevelBasis2, vecLevelTarget2, dataResTarget_Y2, dataResBasis_Y2, 'config 2', dirToSaveResults+prefixName+'_ratio_Y2.png')
     
-    plt.show()
+    #plt.show()
 
 
 main()  
