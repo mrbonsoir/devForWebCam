@@ -77,4 +77,19 @@ To run the code to measure the ratio with webcam run the following code:
 ```
 python computeRatioWithWebcam.py
 ```
-where you may have to tune the parameters in the file
+
+where you may have to tune the parameters in the file. These paramters are the starting point for the two grey patches side by side. One is the target and the other the basis. Nornally target is bigger than the basis and you will run three time the experiment.
+
+## Once again, the good old human fashion way, this time for the ratio
+
+When you start the program, it is displayed in the command window what are the keystrokes to press to adjust the single color channel in order to match visually in intensity grey basis patch + single color channel with the grey target patch.
+
+You can run the code as follows:
+
+```
+python computeRatioWithHumanEye.py
+```
+
+# Getting the values
+Enough tweaking, now it is time to deduce the ratio values, the gamut, the meaning of life and to generate handsome graphs.
+
