@@ -35,9 +35,13 @@ workDir = os.getcwd()
 selectExperiment_3 = False
 
 vecLevelBasis = np.array([30,30, 30])       # Parameters for the ratio search
-vecLevelTarget = 640                        #
+vecLevelTarget = 60                         #
 vecLevelBasis2 = np.array([60, 60 , 60])    #
 vecLevelTarget2 = 80                        #
+
+
+widthFrame   = int(640)
+heightFrame  = int(480)    
 
 # config test
 if configTest:
@@ -174,11 +178,11 @@ def fun_Get_Ratio_By_Channel_By_Human(camera, widthFrame, heightFrame, sub_rec1,
     tabResultBasisY  = np.zeros((3,np.size(vecSearchLevel)))
     tabResultTargetY = np.zeros((3,np.size(vecSearchLevel)))
 
-    levelStep = np.array([valLevelBasis[0], valLevelBasis[1], valLevelBasis[2]])
-    imgTestchart  = imCreateTestchartPatchBase(valLevelTarget,levelStep)
-    imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,3)
+    levelStep     = np.array([vecLevelBasis[0], vecLevelBasis[1], vecLevelBasis[2]])
+    imgTestchart  = imCreateTestchartPatchBase(vecLevelTarget, levelStep)
+    imgT          = cv.CreateImage((widthFrame,heightFrame), cv.IPL_DEPTH_8U,3)
     imgT          = cv.fromarray(imgTestchart)
-    testChartName = 'imTestChartRatio_'+repr(level)+'.jpg'
+    testChartName = 'imTestChartRatio_'+repr(vecLevelBasis[0])+'.jpg'
     cv.ShowImage("winTestChart",imgT)
     cv.SaveImage(dirToSaveResults+testChartName, imgT)
     cv.WaitKey(10)
@@ -188,6 +192,9 @@ def fun_Get_Ratio_By_Channel_By_Human(camera, widthFrame, heightFrame, sub_rec1,
     print 'a/s  down to decrease the level -1/-10.'
     print 'n to go to the next channel.'
 
+    # initialize the search value
+    searchLevelC = vecLevelBasis[0]
+
     while True:
             k_pressed = cv.WaitKey(5)
             # if keystroke pressed is 'q' then level up
@@ -196,71 +203,22 @@ def fun_Get_Ratio_By_Channel_By_Human(camera, widthFrame, heightFrame, sub_rec1,
                 if searchLevelC > 255:
                     searchLevelC = 255
                 print 'level up '+str(searchLevelC)
-                imgTestchart  = imCreateTestchartPatchBase(valLevelTarget,[searchLevelC, valLevelBasis[1], valLevelBasis[2]])
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,3)
+                imgTestchart  = imCreateTestchartPatchBase(vecLevelTarget,[searchLevelC, vecLevelBasis[1], vecLevelBasis[2]])
+                imgT          = cv.CreateImage((widthFrame,heightFrame), cv.IPL_DEPTH_8U,3)
                 imgT          = cv.fromarray(imgTestchart)
                 cv.ShowImage("winTestChart",imgT)
 
-            # if keystroke pressed is 'w' then level down
-            elif k_pressed == ord('w'):
-                print 'level down'
-                searchLevelC = searchLevelC + 10
-                if searchLevelC > 255:
-                    searchLevelC = 255
-                print 'level up '+str(searchLevelC)
-                imgTestchart  = imCreateTestchartPatchBase(valLevelTarget,[searchLevelC, valLevelBasis[1], valLevelBasis[2]])
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,3)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
-
-            # if keystroke pressed is 'a' then level down
-            elif k_pressed == ord('a'):
-                print 'level down'
+            # if keystroke pressed is 'q' then level up
+            if k_pressed == ord('a'):
                 searchLevelC = searchLevelC - 1
                 if searchLevelC < 0:
                     searchLevelC = 0
-                print 'level up '+str(searchLevelC)
-                imgTestchart  = imCreateTestchartPatchBase(valLevelTarget,[searchLevelC, valLevelBasis[1], valLevelBasis[2]])
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,3)
+                print 'level down '+str(searchLevelC)
+                imgTestchart  = imCreateTestchartPatchBase(vecLevelTarget,[searchLevelC, vecLevelBasis[1], vecLevelBasis[2]])
+                imgT          = cv.CreateImage((widthFrame,heightFrame), cv.IPL_DEPTH_8U,3)
                 imgT          = cv.fromarray(imgTestchart)
                 cv.ShowImage("winTestChart",imgT)
 
-            # if keystroke pressed is 's' then level down
-            elif k_pressed == ord('s'):
-                print 'level down'
-                searchLevelC = searchLevelC - 10
-                if searchLevelC < 0:
-                    searchLevelC = 0
-                print 'level up '+str(searchLevelC)
-                imgTestchart  = imCreateTestchartPatchBase(valLevelTarget,[searchLevelC, valLevelBasis[1], valLevelBasis[2]])
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,3)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
-
-            # if keystroke pressed is 'e' the size tile change up
-            elif k_pressed == ord('e'):
-                print 'patch size tile down'
-                sizeTilePatchHT = sizeTilePatchHT / 2
-                if sizeTilePatchHT < 16:
-                    sizeTilePatchHT = 16
-                print 'level up '+str(sizeTilePatchHT)
-                imgTestchart  = imCreateTestchartPatchBase(valLevelTarget,[searchLevelC, valLevelBasis[1], valLevelBasis[2]])
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,3)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
-            
-            # if keystroke pressed is 'd' the size tile change down
-            elif k_pressed == ord('d'):
-                print 'patch size tile down'
-                sizeTilePatchHT = sizeTilePatchHT * 2
-                if sizeTilePatchHT > 512:
-                    sizeTilePatchHT = 512   
-                print 'level up '+str(sizeTilePatchHT)
-                imgTestchart  = imCreateTestchartPatchBase(valLevelTarget,[searchLevelC, valLevelBasis[1], valLevelBasis[2]])
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,3)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
-            
             #if keystroke presses is n for "next" then next level
             elif k_pressed == ord('n'):
                 tabSelectedLevel[0,counterSearchLevel] = searchLevelC # Here we save the Luminance of the left patch alone
@@ -274,7 +232,6 @@ def fun_Get_Ratio_By_Channel_By_Human(camera, widthFrame, heightFrame, sub_rec1,
     return tabSelectedLevel
 
     return frame, tabDiffRGBY, tabDiffRGBL, tabResTargetY, tabResBasisY
-
 
 def funGetRatioByChannel(camera, widthF, heightF, sub_rec1, sub_rec2, valLevelBasis, valLevelTarget):
     '''

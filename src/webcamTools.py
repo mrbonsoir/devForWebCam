@@ -66,21 +66,6 @@ def function_capture_image(file_name_frame, frame_to_be_saved, dir_to_save_image
 
     cv.SaveImage(dir_to_save_image+file_name_frame, frame_to_be_saved)
 
-def imCreateTestchartPatchBase(levelPatch, levelBase):
-    '''
-    The function takes two input values as input such that levelPatch < levelBase.
-    The resulting test chart has a fixed size-
-    '''
-    width = 1024    
-    height = 720
-    imagePatchBase = np.zeros((height, width,3), np.uint8)
-     
-    imagePatchBase[:,0:0.5*width,:] = levelPatch
-    imagePatchBase[:,0.5*width:width,0] = levelBase[0]
-    imagePatchBase[:,0.5*width:width,1] = levelBase[1]
-    imagePatchBase[:,0.5*width:width,2] = levelBase[2]
-    
-    return imagePatchBase
 
 
 def funDiffPatches(subA, subB):
@@ -450,21 +435,31 @@ def funDoErrorDiffusion_JarvisAndAll(imageData):
     ##imageDataHalftoned = np.fliplr(imageDataHalftoned)
     return imageDataHalftoned
 
+
 def imCreateTestchartPatchBase(levelPatch, levelBase):
     '''
     The function takes two input values as input such that levelPatch < levelBase.
     The resulting test chart has a fixed size-
+    
+    Args:
+        levelPatch        : float 
+        levelBase  (array): float 1 x 3
+
+    out:
+        imagePatchBase    : array corresponding to image size n x m x 3
     '''
-    width = 1024
+    
+    width = 1024    
     height = 720
     imagePatchBase = np.zeros((height, width,3), np.uint8)
-         
+     
     imagePatchBase[:,0:0.5*width,:] = levelPatch
     imagePatchBase[:,0.5*width:width,0] = levelBase[0]
     imagePatchBase[:,0.5*width:width,1] = levelBase[1]
     imagePatchBase[:,0.5*width:width,2] = levelBase[2]
     
     return imagePatchBase
+
 
 def imCreateTestChartSingleColor(levelRGB):
     '''
@@ -755,23 +750,6 @@ def funCaptureImage(fileNameFrame,frameToSaved,dirToSaveImage):
     '''
     cv.SaveImage(dirToSaveImage+fileNameFrame, frameToSaved)
     #print "one picture saved, good job!"
-
-def imCreateTestchartPatchBase(levelPatch, levelBase):
-    '''
-    The function takes two input values as input such that levelPatch < levelBase.
-    The resulting test chart has a fixed size-
-    '''
-    width = 1024    
-    height = 720
-    imagePatchBase = np.zeros((height, width,3), np.uint8)
-     
-    imagePatchBase[:,0:0.5*width,:] = levelPatch
-    imagePatchBase[:,0.5*width:width,0] = levelBase[0]
-    imagePatchBase[:,0.5*width:width,1] = levelBase[1]
-    imagePatchBase[:,0.5*width:width,2] = levelBase[2]
-    
-    return imagePatchBase
-
 
 def imCreateTestchartContinuousAndHalftoned(levelContinuous, levelHalftoned, sizeTileHalftone):
     '''
@@ -1110,21 +1088,6 @@ def funDoErrorDiffusion_JarvisAndAll(imageData):
     ##imageDataHalftoned = np.fliplr(imageDataHalftoned)
     return imageDataHalftoned
 
-def imCreateTestchartPatchBase(levelPatch, levelBase):
-    '''
-    The function takes two input values as input such that levelPatch < levelBase.
-    The resulting test chart has a fixed size-
-    '''
-    width = 1024
-    height = 720
-    imagePatchBase = np.zeros((height, width,3), np.uint8)
-         
-    imagePatchBase[:,0:0.5*width,:] = levelPatch
-    imagePatchBase[:,0.5*width:width,0] = levelBase[0]
-    imagePatchBase[:,0.5*width:width,1] = levelBase[1]
-    imagePatchBase[:,0.5*width:width,2] = levelBase[2]
-    
-    return imagePatchBase
 
 def imCreateTestChartSingleColor(levelRGB):
     '''
