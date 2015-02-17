@@ -21,9 +21,9 @@ from colorDifferences import *
 from webcamTools import *
 import sys, os, shutil
 
-configTest = True
-configMeasurement = False
-number_camera = 1
+configTest = False
+configMeasurement = True
+number_camera = 0
 max_number_frame_to_wait_between_measurement = 50
 max_number_frame_to_keep  = 25
 tabOscillographeDifferences = np.zeros((4,max_number_frame_to_keep))

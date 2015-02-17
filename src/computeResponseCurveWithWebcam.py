@@ -21,9 +21,9 @@ from colorDifferences import *
 from webcamTools import *
 import sys, os, shutil
 
-configTest = True
-configMeasurement = False
-number_camera = 1
+configTest = False
+configMeasurement = True
+number_camera = 0
 max_number_frame_to_wait_between_measurement = 50
 max_number_frame_to_keep  = 25
 tabOscillographeDifferences = np.zeros((4,max_number_frame_to_keep))
@@ -253,144 +253,14 @@ def funGetResponseCurve2(camera, levelContinuous, levelHaltone, widthF, heightF,
 
     return frame, tabDiffContinuousHalftoneL, tabResultsContinousL, tabResultsHalftoneL
 
-def function_get_response_curve_from_human(widthF,heightF):
-    ''' The function does the same as funGetResponseCurve2 but instead of
-    asking the camera we ask a human user to do the job
-
-    Args:
-        camera: an image but actually I don't need it here 
-        levelContinuous: not needed
-        levelHaltone: not needed
-        widthF 
-        heightF 
-        sub_rec1: not needed
-        sub_rec2: not needed
-
-    Output:
-        frame: an image  
-        tabSelectedLevel: array (float [floats]) of size 1 x size(vecSearchLevel)
-
-        tabDiffContinuousHalftoneL: array (float [floats]) of size 1 x size(vecSearchLevel)
-        tabResultsContinousL      : array (float [floats]) of size 1 x size(vecSearchLevel)
-        tabResultsHalftoneL       : array (float [floats]) of size 1 x size(vecSearchLevel)
-        
-    '''
-    global vecLevel
-    global vecSearchLevel
-    global sizeTilePatchHT
-    global tabOscillographeDifferences
-    global max_number_frame_to_wait_between_measurement
-
-    # imitialize some parameters
-    tabSelectedLevel   = np.zeros((1,np.size(vecSearchLevel)))
-    counterSearchLevel = 0
-
-    # Some guidelines
-    print 'q up to increase the level.'
-    print 'a down to decrease the level.'
-    print 'n to go to the next level.'
-
-    for searchLevel in vecSearchLevel:
-        # Here I create a testchart
-        imgTestchart  = imCreateTestchartContinuousAndHalftoned(searchLevel, 0, sizeTilePatchHT)
-        imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
-        imgT          = cv.fromarray(imgTestchart)
-        cv.ShowImage("winTestChart",imgT)    
-
-        print 'level haltoning is '+str(searchLevel)
-        searchLevelC = 0
-
-        while True:
-            k_pressed = cv.WaitKey(5)
-            # if keystroke pressed is 'q' then level up
-            if k_pressed == ord('q'):
-                searchLevelC = searchLevelC + 1
-                if searchLevelC > 255:
-                    searchLevelC = 255
-                print 'level up '+str(searchLevelC)
-                imgTestchart  = imCreateTestchartContinuousAndHalftoned(searchLevel, searchLevelC, sizeTilePatchHT)
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
-
-            # if keystroke pressed is 'w' then level down
-            elif k_pressed == ord('w'):
-                print 'level down'
-                searchLevelC = searchLevelC + 10
-                if searchLevelC > 255:
-                    searchLevelC = 255
-                print 'level up '+str(searchLevelC)
-                imgTestchart  = imCreateTestchartContinuousAndHalftoned(searchLevel, searchLevelC, sizeTilePatchHT)
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
-
-            # if keystroke pressed is 'a' then level down
-            elif k_pressed == ord('a'):
-                print 'level down'
-                searchLevelC = searchLevelC - 1
-                if searchLevelC < 0:
-                    searchLevelC = 0
-                print 'level up '+str(searchLevelC)
-                imgTestchart  = imCreateTestchartContinuousAndHalftoned(searchLevel, searchLevelC, sizeTilePatchHT)
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
-            
-            # if keystroke pressed is 's' then level down
-            elif k_pressed == ord('s'):
-                print 'level down'
-                searchLevelC = searchLevelC - 10
-                if searchLevelC < 0:
-                    searchLevelC = 0
-                print 'level up '+str(searchLevelC)
-                imgTestchart  = imCreateTestchartContinuousAndHalftoned(searchLevel, searchLevelC, sizeTilePatchHT)
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
-
-            # if keystroke pressed is 'e' the size tile change up
-            elif k_pressed == ord('e'):
-                print 'patch size tile down'
-                sizeTilePatchHT = sizeTilePatchHT / 2
-                if sizeTilePatchHT < 16:
-                    sizeTilePatchHT = 16
-                print 'level up '+str(sizeTilePatchHT)
-                imgTestchart  = imCreateTestchartContinuousAndHalftoned(searchLevel, searchLevelC, sizeTilePatchHT)
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
-            
-            # if keystroke pressed is 'd' the size tile change down
-            elif k_pressed == ord('d'):
-                print 'patch size tile down'
-                sizeTilePatchHT = sizeTilePatchHT * 2
-                if sizeTilePatchHT > 512:
-                    sizeTilePatchHT = 512   
-                print 'level up '+str(sizeTilePatchHT)
-                imgTestchart  = imCreateTestchartContinuousAndHalftoned(searchLevel, searchLevelC, sizeTilePatchHT)
-                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
-                imgT          = cv.fromarray(imgTestchart)
-                cv.ShowImage("winTestChart",imgT)
-
-            #if keystroke presses is n for "next" then next level
-            elif k_pressed == ord('n'):
-                tabSelectedLevel[0,counterSearchLevel] = searchLevelC # Here we save the Luminance of the left patch alone
-                counterSearchLevel = counterSearchLevel + 1
-                break
-
-    print 'result by human observer:'
-    print vecSearchLevel
-    print tabSelectedLevel
-
-    return tabSelectedLevel
-
 def funComputeResponseCurveFromMeasurement(tabMeasurement, vectorLevel, vectorSearchLevel):
     '''
     The function does some processing like interpolation on the obtained curves, this to
     find the local minima corresponding to the search value for a given digital input.
 
     It also display curves as figure and save them.
+
+    Fonction a bit weird because doing some computing and displaying graphs.
 
     Args:
         tabMeasurement [floats]    : some intensity measurement Y or L 
@@ -575,7 +445,7 @@ def funDisplayDifferenceCurveIn3D(vecDigitLevel, inputData_x, dataToDisplay_y, x
     plt.draw()
     plt.savefig(figureName)# dirToSaveResults+prefixName+'_c1_2.png')
 
-def funComputeFittedResponseCurve(responseCurve, vec_meas_curve):#, data_stellar):
+def funComputeFittedResponseCurve(responseCurve, vec_meas_curve):
     '''
     The function takes the points from the computed response curve and fit a curve to get something who look like
     a gamma kind of shape
@@ -654,6 +524,43 @@ def funComputeFittedResponseCurve(responseCurve, vec_meas_curve):#, data_stellar
 
     return fitted_Response_Curve, plsq[0]
 
+def fun_Plot_Two_Fitted_Response_Curves(parameters_gamma1, parameters_gamma2, figure_name):
+    '''
+    The function takes as input the parameters of the two fitted response curve for the 
+    two methods and display the results in one graph.
+    '''
+
+    vec_data_fitted = np.arange(0,256,8)
+    data_fitted_method1 = funSuperFittFunction(vec_data_fitted, parameters_gamma1[0], 
+                                                                parameters_gamma1[1], 
+                                                                parameters_gamma1[2], 
+                                                                parameters_gamma1[3])
+
+    data_fitted_method2 = funSuperFittFunction(vec_data_fitted, parameters_gamma2[0], 
+                                                                parameters_gamma2[1], 
+                                                                parameters_gamma2[2], 
+                                                                parameters_gamma2[3])
+
+    # now plot the two fitted curves together
+    fig = plt.figure()
+    plt.plot(vec_data_fitted, vec_data_fitted / 255.,'k-')
+    plt.plot(np.power(vec_data_fitted / 255.,2.2),'k-')
+    plt.text(255 / 2,                  0.5, 'linear', horizontalalignment='center', verticalalignment='center', rotation=38,bbox = dict(boxstyle='round', fc="w", ec="k"))
+    plt.text(180, np.power(170 / 255.,2.2), 'gamma 2.2', horizontalalignment='center', verticalalignment='center', rotation=48.,bbox = dict(boxstyle='round', fc="w", ec="k"))
+    
+    print data_fitted_method1
+    print data_fitted_method2
+    plt.plot(vec_data_fitted, data_fitted_method1 / 255.,'.b-', label='method 1')
+    plt.plot(vec_data_fitted, data_fitted_method2 / 255.,'.r-', label='method 2')
+    plt.xlabel('Digital input')
+    plt.title('Fitted Response Curve Comparison')
+    plt.xlim(0,255)
+    plt.ylim(0,1)
+    plt.legend(loc=2)
+    plt.draw()
+    plt.savefig(figure_name)
+    
+
 def main():
     ''' Here the trouble start.
     '''
@@ -678,6 +585,15 @@ def main():
     # SAVE the data
     np.savetxt(dirToSaveResults+prefixName+'_RC_final1.txt', (responseCurve1),fmt='%03.2f')  
 
+    # WE DO MORE to fit some curve with expected RC shape:
+    dataResponseCurve1 = np.loadtxt(dirToSaveResults+prefixName+'_RC_final1.txt')  
+    fittedResponseCurve1, parameters_gamma1 = funComputeFittedResponseCurve(dataResponseCurve1, vecLevel)
+    np.savetxt(dirToSaveResults+prefixName+'_RC_final_fitted.txt', (responseCurve1),fmt='%03.2f') 
+    np.savetxt(dirToSaveResults+prefixName+'_param_gamma_curve1.txt', (parameters_gamma1),fmt='%03.2f') 
+    print 'Result for Method 2:'
+    print 'res points fitted curve: ',fittedResponseCurve1 
+    print 'res param gamma curve:', parameters_gamma1
+
     #  LOAD the saved measurement for Method 2: 
     dataContinuous = np.loadtxt(dirToSaveResults+prefixName+'_ContinuousRC_L.txt')
     dataHalftone   = np.loadtxt(dirToSaveResults+prefixName+'_HalftoneRC_L.txt')
@@ -692,15 +608,18 @@ def main():
     np.savetxt(dirToSaveResults+prefixName+'_RC_final2.txt', (responseCurve2),fmt='%03.2f')  
 
     # WE DO MORE to fit some curve with expected RC shape:
-    dataResponseCurve = np.loadtxt(dirToSaveResults+prefixName+'_RC_final2.txt')  
-    fittedResponseCurve, parameters_gamma = funComputeFittedResponseCurve(dataResponseCurve, vecSearchLevel)
+    dataResponseCurve2 = np.loadtxt(dirToSaveResults+prefixName+'_RC_final2.txt')  
+    fittedResponseCurve2, parameters_gamma2 = funComputeFittedResponseCurve(dataResponseCurve2, vecSearchLevel)
     np.savetxt(dirToSaveResults+prefixName+'_RC_final_fitted.txt', (responseCurve2),fmt='%03.2f') 
-    np.savetxt(dirToSaveResults+prefixName+'_param_gamma_curve.txt', (parameters_gamma),fmt='%03.2f') 
-    print 'res points fitted curve:',fittedResponseCurve 
-    print 'res param gamma curve:', parameters_gamma 
+    np.savetxt(dirToSaveResults+prefixName+'_param_gamma_curve2.txt', (parameters_gamma2),fmt='%03.2f') 
+    print 'Result for Method 2:'
+    print 'res points fitted curve: ',fittedResponseCurve2
+    print 'res param gamma curve:', parameters_gamma2
 
     # LAST BUT NOT LEAST we display RC by both methods:
     funPlotTwoResponseCurves(vecLevel, responseCurve1, vecSearchLevel, responseCurve2, 'The two methods together')
+
+    fun_Plot_Two_Fitted_Response_Curves(parameters_gamma1, parameters_gamma2,'The two methods by fitted curve model')
     
     plt.show()
 

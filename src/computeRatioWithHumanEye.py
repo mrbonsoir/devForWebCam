@@ -21,8 +21,8 @@ from colorDifferences import *
 from webcamTools import *
 import sys, os, shutil
 
-configTest = True
-configMeasurement = False
+configTest = False
+configMeasurement = True
 number_camera = 0
 max_number_frame_to_wait_between_measurement = 50
 max_number_frame_to_keep  = 25

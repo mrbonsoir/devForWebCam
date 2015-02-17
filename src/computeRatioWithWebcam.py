@@ -21,8 +21,8 @@ from colorDifferences import *
 from webcamTools import *
 import sys, os, shutil
 
-configTest = True
-configMeasurement = False
+configTest = False
+configMeasurement = True
 number_camera = 1
 max_number_frame_to_wait_between_measurement = 50
 max_number_frame_to_keep  = 25
@@ -35,7 +35,7 @@ workDir = os.getcwd()
 selectExperiment_3 = False
 
 vecLevelBasis = np.array([30,30, 30])       # Parameters for the ratio search
-vecLevelTarget = 640                        #
+vecLevelTarget = 40                        #
 vecLevelBasis2 = np.array([60, 60 , 60])    #
 vecLevelTarget2 = 80                        #
 
