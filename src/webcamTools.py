@@ -692,18 +692,6 @@ def funDoHalftoningByMaskFullRandomRGB(imRGB):
     
     return image_halftoned
     
-def funSuperFittFunction(x, A, B, alpha, beta):
-    '''
-    This function is a super gamma curve swiss knife.
-    val = A.x^alpha / (x^beta + B)
-    '''
-    nume = A*np.power(x/255., alpha) 
-    deno = np.power(x/255., beta) + B
-    deno = deno + 1e-6 # ugly trick
-    val = nume / deno  
-    # and normalization des familles
-    val = val / ( (A*np.power(1, alpha)) / (np.power(1, beta) + B))
-    return val
 
 def function_display_RC_by_user(data_by_User):
     ''' The function display the response curve from level selected
@@ -1323,7 +1311,7 @@ def funSuperFittFunction(x, A, B, alpha, beta):
     '''
     nume = A*np.power(x/255., alpha) 
     deno = np.power(x/255., beta) + B
-    deno = deno + 1e-6 # ugly trick
+    deno = deno + 1e-6 # ugly trick to avoid to divide by 0
     val = nume / deno  
     # and normalization des familles
     val = val / ( (A*np.power(1, alpha)) / (np.power(1, beta) + B))

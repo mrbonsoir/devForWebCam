@@ -409,7 +409,6 @@ def funDisplayDifferenceCurveAndMinimun(vecDigitLevel, inputData_x, dataToDispla
     plt.title(titleText)
     plt.draw()
     plt.savefig(figureName)
-
     return indMinimum
 
 def funDisplayDifferenceCurveIn3D(vecDigitLevel, inputData_x, dataToDisplay_y, xLabelText, yLabelText, zLabelText, titleText, figureName):
@@ -448,7 +447,7 @@ def funDisplayDifferenceCurveIn3D(vecDigitLevel, inputData_x, dataToDisplay_y, x
 def funComputeFittedResponseCurve(responseCurve, vec_meas_curve):
     '''
     The function takes the points from the computed response curve and fit a curve to get something who look like
-    a gamma kind of shape
+    a gamma kind of shape.
     '''
     #def fitFunc(t, A, B, alpha, beta):
     #    nume = A*np.power(t/255., alpha) 
@@ -459,12 +458,11 @@ def funComputeFittedResponseCurve(responseCurve, vec_meas_curve):
     #    val = val / ( (A*np.power(1, alpha)) / (np.power(1, beta) + B))
     #    return val
 
-    x = vec_meas_curve
+    x       = vec_meas_curve
     gamma22 = funSuperFittFunction(x, 1, 0, 2.2,0)
-    y_meas = responseCurve
-    y_meas = y_meas / np.max(y_meas)
-    #print y_meas
-
+    y_meas  = responseCurve
+    y_meas  = y_meas / np.max(y_meas)
+    
     def residuals(p, y, x):
         A, B, alpha, beta = p
         err = y - funSuperFittFunction(x, A, B, alpha, beta)
@@ -480,34 +478,25 @@ def funComputeFittedResponseCurve(responseCurve, vec_meas_curve):
     # do the optimization biatch
     plsq = leastsq(residuals, p0, args=(y_meas, x))
     fitted_Response_Curve = peval(x,plsq[0])
-    #print np.shape(plsq), plsq[0]
-
+    
     # OR WE DO IT LIKE THIS:
     estimated_param, err_estim = curve_fit(funSuperFittFunction, x, y_meas, p0)
     fitted_Response_Curve2 = peval(x,estimated_param)
-    #print 'Hammer time----------------------------------------'
-    #print 'ICI REGARDE'
-    #print 'curve fit',estimated_param, np.shape(estimated_param)
-    #print 'lseastsq', plsq[0], np.shape(plsq[0])
-    #print 'Hammer time----------------------------------------'
-    #fitted_Response_Curve = funSuperFittFunction(x, estimated_param)
-
+    
+    # Note for the readers:
+    # leastsq or curve_fit give exactly the same parameters for the curve
+    # model we want to obtain the parameters...
+    #
+    
     guess_start_curve = peval(x,p0)
-    # display the results
     fig = plt.figure()
 
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
-    #plt.xlabel(r'\textbf{time} (s)')
-    #plt.ylabel(r'\textit{voltage} (mV)',fontsize=16)
-    #plt.title(r"\TeX\ is Number "r"$\displaystyle\sum_{n=1}^\infty\frac{-e^{i\pi}}{2^n}$!",fontsize=16, color='gray')
-    print guess_start_curve
     plt.plot(x,guess_start_curve,'k',label='guess start')
     plt.plot(x,gamma22,'r',label='gamma 2.2')
     plt.plot(x,y_meas,'g.-', label ='measurement')
-    #print np.shape(data_stellar)
-    #plt.plot(data_stellar[:,0], data_stellar[:,1],'.-k',label='Spectro')
-
+    
     A_par, B_par, alpha_par, beta_par = plsq[0]
     print A_par, B_par, alpha_par, beta_par
 
@@ -520,46 +509,8 @@ def funComputeFittedResponseCurve(responseCurve, vec_meas_curve):
     plt.draw()
     figureName = dirToSaveResults+prefixName+'_c2_5.png'
     plt.savefig(figureName)
-    #plt.show()
-
-    return fitted_Response_Curve, plsq[0]
-
-def fun_Plot_Two_Fitted_Response_Curves(parameters_gamma1, parameters_gamma2, figure_name):
-    '''
-    The function takes as input the parameters of the two fitted response curve for the 
-    two methods and display the results in one graph.
-    '''
-
-    vec_data_fitted = np.arange(0,256,8)
-    data_fitted_method1 = funSuperFittFunction(vec_data_fitted, parameters_gamma1[0], 
-                                                                parameters_gamma1[1], 
-                                                                parameters_gamma1[2], 
-                                                                parameters_gamma1[3])
-
-    data_fitted_method2 = funSuperFittFunction(vec_data_fitted, parameters_gamma2[0], 
-                                                                parameters_gamma2[1], 
-                                                                parameters_gamma2[2], 
-                                                                parameters_gamma2[3])
-
-    # now plot the two fitted curves together
-    fig = plt.figure()
-    plt.plot(vec_data_fitted, vec_data_fitted / 255.,'k-')
-    plt.plot(np.power(vec_data_fitted / 255.,2.2),'k-')
-    plt.text(255 / 2,                  0.5, 'linear', horizontalalignment='center', verticalalignment='center', rotation=38,bbox = dict(boxstyle='round', fc="w", ec="k"))
-    plt.text(180, np.power(170 / 255.,2.2), 'gamma 2.2', horizontalalignment='center', verticalalignment='center', rotation=48.,bbox = dict(boxstyle='round', fc="w", ec="k"))
     
-    print data_fitted_method1
-    print data_fitted_method2
-    plt.plot(vec_data_fitted, data_fitted_method1 / 255.,'.b-', label='method 1')
-    plt.plot(vec_data_fitted, data_fitted_method2 / 255.,'.r-', label='method 2')
-    plt.xlabel('Digital input')
-    plt.title('Fitted Response Curve Comparison')
-    plt.xlim(0,255)
-    plt.ylim(0,1)
-    plt.legend(loc=2)
-    plt.draw()
-    plt.savefig(figure_name)
-    
+    return fitted_Response_Curve, plsq[0]    
 
 def main():
     ''' Here the trouble start.
@@ -588,11 +539,11 @@ def main():
     # WE DO MORE to fit some curve with expected RC shape:
     dataResponseCurve1 = np.loadtxt(dirToSaveResults+prefixName+'_RC_final1.txt')  
     fittedResponseCurve1, parameters_gamma1 = funComputeFittedResponseCurve(dataResponseCurve1, vecLevel)
-    np.savetxt(dirToSaveResults+prefixName+'_RC_final_fitted.txt', (responseCurve1),fmt='%03.2f') 
+    np.savetxt(dirToSaveResults+prefixName+'_RC_final_fitted1.txt', (fittedResponseCurve1),fmt='%03.2f') 
     np.savetxt(dirToSaveResults+prefixName+'_param_gamma_curve1.txt', (parameters_gamma1),fmt='%03.2f') 
-    print 'Result for Method 2:'
-    print 'res points fitted curve: ',fittedResponseCurve1 
-    print 'res param gamma curve:', parameters_gamma1
+    print 'Result for Method 1:'
+    print 'res points fitted curve: ', fittedResponseCurve1 
+    print 'res param gamma curve: ', parameters_gamma1
 
     #  LOAD the saved measurement for Method 2: 
     dataContinuous = np.loadtxt(dirToSaveResults+prefixName+'_ContinuousRC_L.txt')
@@ -610,17 +561,23 @@ def main():
     # WE DO MORE to fit some curve with expected RC shape:
     dataResponseCurve2 = np.loadtxt(dirToSaveResults+prefixName+'_RC_final2.txt')  
     fittedResponseCurve2, parameters_gamma2 = funComputeFittedResponseCurve(dataResponseCurve2, vecSearchLevel)
-    np.savetxt(dirToSaveResults+prefixName+'_RC_final_fitted.txt', (responseCurve2),fmt='%03.2f') 
+    np.savetxt(dirToSaveResults+prefixName+'_RC_final_fitted2.txt', (fittedResponseCurve2),fmt='%03.2f') 
     np.savetxt(dirToSaveResults+prefixName+'_param_gamma_curve2.txt', (parameters_gamma2),fmt='%03.2f') 
     print 'Result for Method 2:'
     print 'res points fitted curve: ',fittedResponseCurve2
-    print 'res param gamma curve:', parameters_gamma2
+    print 'res param gamma curve:', parameters_gamma2   
 
     # LAST BUT NOT LEAST we display RC by both methods:
-    funPlotTwoResponseCurves(vecLevel, responseCurve1, vecSearchLevel, responseCurve2, 'The two methods together')
+    funPlotTwoResponseCurves(vecLevel, fittedResponseCurve1 * 255, vecSearchLevel, fittedResponseCurve2 * 255, 'The two methods together')
 
-    fun_Plot_Two_Fitted_Response_Curves(parameters_gamma1, parameters_gamma2,'The two methods by fitted curve model')
-    
+    vec_data_fitted = np.hstack([np.arange(0,256,4), 255])
+    all_vec_fittedResponseCurve1 = funSuperFittFunction(vec_data_fitted, parameters_gamma1[0], parameters_gamma1[1], parameters_gamma1[2], parameters_gamma1[3])
+    all_vec_fittedResponseCurve2 = funSuperFittFunction(vec_data_fitted, parameters_gamma2[0], parameters_gamma2[1], parameters_gamma2[2], parameters_gamma2[3])
+
+    funPlotTwoResponseCurves(vec_data_fitted, all_vec_fittedResponseCurve1 * 255,
+                             vec_data_fitted, all_vec_fittedResponseCurve2 * 255,
+                            'The two fitted methods together')
+
     plt.show()
 
 
