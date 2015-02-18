@@ -379,8 +379,8 @@ def funPlotTwoResponseCurves(vecInput1, responseCurve1, vecInput2, responseCurve
     
     plt.plot(vecInput1, responseCurve1 / 255.,'b-', label='method 1')
     plt.plot(vecInput2, responseCurve2 / 255.,'r-',label='method 2')
-    plt.plot(vecInput1, responseCurve1 / 255.,'.b')
-    plt.plot(vecInput2, responseCurve2 / 255.,'r.')
+    #plt.plot(vecInput1, responseCurve1 / 255.,'.b')
+    #plt.plot(vecInput2, responseCurve2 / 255.,'.r')
     
     plt.xlabel('Digital input')
     plt.title('Response Curve comparison')
@@ -579,7 +579,6 @@ def main():
                             'The two fitted methods together')
 
     plt.show()
-
 
 main()  
 print 'well done, you reach the biggest achievement of your day, or maybe the second, not bad.'
