@@ -1,16 +1,7 @@
+
 '''
 Created on 21.01.2013
 Here we position the camera to do measurement once the configuratin is
-well enough adjusted. 
-@author: gerjer
-'''
-
-import sys
-import cv2.cv as cv
-import numpy as np
-'''
-Created on 21.01.2013
-Here we position the camera to do measurement once the configuration is
 well enough adjusted. 
 @author: gerjer
 '''
@@ -22,7 +13,7 @@ import scipy
 from scipy import interpolate
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-import Image
+#import Image
 import time
 from colorConversion import *
 from colorDifferences import *

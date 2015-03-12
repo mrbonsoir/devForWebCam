@@ -7,11 +7,11 @@ well enough adjusted.
 
 import cv2.cv as cv
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg    
-from mpl_toolkits.mplot3d import Axes3D
-import Image
-import time
+#import matplotlib.pyplot as plt
+#import matplotlib.image as mpimg    
+#from mpl_toolkits.mplot3d import Axes3D
+#import Image
+#import time
 from colorConversion import *
 from colorDifferences import *
 from webcamTools import *
@@ -70,7 +70,7 @@ def main():
         print 'The camera number is 0.'
         function_show_webcam_stream()
     else:
-        print 'The camera number is'+sys.argv[1]+'.'
+        print 'The camera number is '+sys.argv[1]+'.'
         function_show_webcam_stream(int(sys.argv[1]))
     
       
