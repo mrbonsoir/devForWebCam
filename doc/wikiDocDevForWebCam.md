@@ -56,6 +56,13 @@ This Python file is running two different methods to estimate the RC. One is cal
 - Method 1 is comparing for every ramp step in its halftoned version a ramp of continuous tone.
 - Methos 2 is smarter. Less images are taken and the process is supposed to be faster.
 
+Or to run just the method 1:
+
+```
+python scriptComputeResponseCurveWithWebcamMethod1.py
+```
+
+
 ## The good old human fashion way
 
 Eventually you want to compare the cyborg way with the human way. That is what this other code is trying to do. Instead of letting the programm deciding when the two patches side by side are equivalent in intensity, you are now in charge and you decide by increasing of decreasing the halftone patch value while the continuous one remains at a fixed ramp value. 
