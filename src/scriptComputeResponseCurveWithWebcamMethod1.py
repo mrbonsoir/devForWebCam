@@ -21,10 +21,11 @@ from colorDifferences import *
 from webcamTools import *
 import sys, os, shutil
 
+
 configTest = False
 configMeasurement = True
 number_camera = 0
-max_number_frame_to_wait_between_measurement = 25
+max_number_frame_to_wait_between_measurement = 50
 max_number_frame_to_keep  = 25
 tabOscillographeDifferences = np.zeros((4,max_number_frame_to_keep))
 max_number_point_to_show = 3
@@ -44,9 +45,9 @@ if configTest:
 # config measurement
 if configMeasurement:
     prefixName         = 'test33'
-    stepVecLevel       = 64
+    stepVecLevel       = 32
     vecLevel           = np.round(np.hstack((np.arange(0, 255, stepVecLevel), 255)))
-    stepVecLevelSearch = 32
+    stepVecLevelSearch = 16
     vecSearchLevel     = np.round(np.hstack((np.arange(0,255, stepVecLevelSearch), 255)))
 
 
@@ -74,11 +75,11 @@ def funDisplayWebcamAndTakePictures(number_camera):
     heightFrame  = int(480)    
 
     # rectangle coordinates
-    sub_rec1 = np.array([220,200,80,80])
-    sub_rec2 = np.array([340,200,80,80])
+    sub_rec1 = np.array([240,200,60,60])
+    sub_rec2 = np.array([340,200,60,60])
        
     # display one test-chart black/green to postion the window
-    imgTestchart = imCreateTestchartContinuousAndHalftoned(mid_level,mid_level, sizeTilePatchHT)
+    imgTestchart = imCreateTestchartContinuousAndHalftoned(mid_level,mid_level, sizeTilePatchHT, 96)
     imgT = cv.CreateImage((np.shape(imgTestchart)[0],np.shape(imgTestchart)[0]), cv.IPL_DEPTH_8U,1)
     imgT = cv.fromarray(imgTestchart)
     cv.SaveImage('./firstTestChart.png', imgT)
@@ -496,13 +497,16 @@ def main():
     print 'Now we process the data'
 
     # LOAD the saved measurement for Method 1:
-    dataDiff = np.loadtxt(dirToSaveResults+prefixName+'_diffRC_L.txt')   
+    dataDiff   = np.loadtxt(dirToSaveResults+prefixName+'_diffRC_L.txt')   
+    dataDiff_Y = np.loadtxt(dirToSaveResults+prefixName+'_diffRC_Y.txt')   
     
     # COMPUTE the response curve (RC) using Method 1:
     responseCurve1 = funComputeResponseCurveFromMeasurement(dataDiff, vecLevel, vecSearchLevel)
+    responseCurve1_Y = funComputeResponseCurveFromMeasurement(dataDiff_Y, vecLevel, vecSearchLevel)
 
     # SAVE the data
     np.savetxt(dirToSaveResults+prefixName+'_RC_final1.txt', (responseCurve1),fmt='%03.2f')  
+    np.savetxt(dirToSaveResults+prefixName+'_RC_final1_Y.txt', (responseCurve1_Y),fmt='%03.2f')  
 
     # WE DO MORE to fit some curve with expected RC shape:
     dataResponseCurve1 = np.loadtxt(dirToSaveResults+prefixName+'_RC_final1.txt')  

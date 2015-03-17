@@ -23,13 +23,13 @@ import sys, os, shutil
 
 configTest = False
 configMeasurement = True
-number_camera = 1
+number_camera = 0
 max_number_frame_to_wait_between_measurement = 25
 max_number_frame_to_keep  = 25
 tabOscillographeDifferences = np.zeros((4,max_number_frame_to_keep))
 max_number_point_to_show = 3
 mid_level = 128
-sizeTilePatchHT = 128  # parameter for the HT patches with halftoning by mask
+sizeTilePatchHT = 128 # parameter for the HT patches with halftoning by mask
 dirToSaveResults = './'
 workDir = os.getcwd()
 

@@ -31,7 +31,7 @@ def fun_read_input_CS2000(input_file):
 			print a
 		else:
 			res_as_list.append([float(a[0]),float(a[1]),float(a[2]),float(a[3]),float(a[4]),float(a[5])])
-			print a
+			print append
 		else:
 			break
 	f.close()

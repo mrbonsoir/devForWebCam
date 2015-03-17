@@ -20,7 +20,7 @@ import Image
 import time
 from colorConversion import *
 from colorDifferences import *
-from webcamToos import *
+from webcamTools import *
 import sys
 
 # Some global variabl

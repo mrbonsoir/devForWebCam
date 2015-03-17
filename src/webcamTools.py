@@ -698,11 +698,15 @@ def function_display_RC_by_user(data_by_User):
     '''
 
     fig = plt.figure()
-    plt.plot(data_by_User[0,:], data_by_User[1,:],'b-')
+    plt.plot(data_by_User[0,:], data_by_User[1,:] / 255.,'bo-', label='Human')
+    plt.plot(data_by_User[0,:], data_by_User[0,:] / 255.,'k-', label='linear')
+    plt.plot(data_by_User[0,:], np.power(data_by_User[0,:]/255., 2.2), 'k:', label='gamma')
     plt.xlabel('digital input')
     plt.ylabel('digital Ding')
+    plt.title('Response Curve by Human Observer')
+    plt.legend(loc=2)
     plt.xlim(0,255)
-    plt.ylim(0,255)
+    plt.ylim(0,1)
     plt.draw()
 
 def initCamera(selectCamera):
@@ -730,7 +734,7 @@ def funCaptureImage(fileNameFrame,frameToSaved,dirToSaveImage):
     cv.SaveImage(dirToSaveImage+fileNameFrame, frameToSaved)
     #print "one picture saved, good job!"
 
-def imCreateTestchartContinuousAndHalftoned(levelContinuous, levelHalftoned, sizeTileHalftone):
+def imCreateTestchartContinuousAndHalftoned(levelContinuous, levelHalftoned, sizeTileHalftone, background=128):
     '''
     Here I create the image, one side continuous and the other halftoned.
     The sizeTileHalftone parameter is used to play with the size of the point in 
@@ -739,6 +743,15 @@ def imCreateTestchartContinuousAndHalftoned(levelContinuous, levelHalftoned, siz
     Actually it can be smaller than 16, but there will be a problem because
     of the Ht by mask, to have a minimum size of 16 ensures that 256 levels 
     available.
+
+    Input:
+        - levelContinuous float (floats) : level of the left part of the testchart
+        - levelHalftoned float (floats)  : levle of the right part of the testchart
+        - sizeTileHalftone float (floats): how big are the tile for the halftone part
+        - background float (float)       : background level to get a uniform  background around
+                                           the part to be measured.
+    Output:
+        - imageTestchartContinuousHalfoned np table.
     '''
     width = 1024
     height = 720
@@ -762,6 +775,16 @@ def imCreateTestchartContinuousAndHalftoned(levelContinuous, levelHalftoned, siz
     # and finally
     imageTestchartContinuousHalfoned[104:616,0:512] = im1
     imageTestchartContinuousHalfoned[104:616,512:width] = im22
+
+    # and now we set the part around the part to be measured to the background value
+    if background != 0:
+        # left and right
+        imageTestchartContinuousHalfoned[:, 0:280]    =  np.ones((720,280),np.uint8)*background
+        imageTestchartContinuousHalfoned[:, 744:1024] =  np.ones((720,280),np.uint8)*background
+        # top and bottom
+        imageTestchartContinuousHalfoned[0:180,:]      =  np.ones((180,1024),np.uint8)*background
+        imageTestchartContinuousHalfoned[540:720,:] =  np.ones((180,1024),np.uint8)*background
+
 
     return imageTestchartContinuousHalfoned
 
@@ -1066,7 +1089,6 @@ def funDoErrorDiffusion_JarvisAndAll(imageData):
     ## flip the image to get the best distribution close to the border
     ##imageDataHalftoned = np.fliplr(imageDataHalftoned)
     return imageDataHalftoned
-
 
 def imCreateTestChartSingleColor(levelRGB):
     '''

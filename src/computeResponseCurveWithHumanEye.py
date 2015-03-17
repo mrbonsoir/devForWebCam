@@ -660,7 +660,7 @@ def main():
     dataUser = np.loadtxt(dirToSaveResults+prefixName+'val_selected_by_user.txt')
     dataUser = np.vstack([vecSearchLevel, dataUser])
     function_display_RC_by_user(dataUser)
-   
+    plt.savefig('RCbyUserJIB.png')
     plt.show()
 
 
