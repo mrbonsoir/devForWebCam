@@ -166,14 +166,6 @@ def funGetRatioByChannel(camera, widthF, heightF, sub_rec1, sub_rec2, valLevelBa
             else:
                 print 'You are going too far.'
 
-            imgTestchart  = imCreateTestchartPatchBase(valLevelTarget,levelStep)
-            imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,3)
-            imgT          = cv.fromarray(imgTestchart)
-            testChartName = 'imTestChartRatioBlue_'+repr(level)+'.jpg'
-            cv.ShowImage("winTestChart",imgT)
-            cv.SaveImage(dirToSaveResults+testChartName, imgT)
-            cv.WaitKey(10)
-
             #-----
             # Here I create a flash
             timer = 0
@@ -203,6 +195,16 @@ def funGetRatioByChannel(camera, widthF, heightF, sub_rec1, sub_rec2, valLevelBa
                 cv.WaitKey(5)
                 timer = timer +1
             #-----
+
+
+
+            imgTestchart  = imCreateTestchartPatchBase(valLevelTarget,levelStep)
+            imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,3)
+            imgT          = cv.fromarray(imgTestchart)
+            testChartName = 'imTestChartRatioBlue_'+repr(level)+'.jpg'
+            cv.ShowImage("winTestChart",imgT)
+            cv.SaveImage(dirToSaveResults+testChartName, imgT)
+            cv.WaitKey(10)
 
             # I display the stream again
             timer = 0
