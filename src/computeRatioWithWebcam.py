@@ -174,9 +174,39 @@ def funGetRatioByChannel(camera, widthF, heightF, sub_rec1, sub_rec2, valLevelBa
             cv.SaveImage(dirToSaveResults+testChartName, imgT)
             cv.WaitKey(10)
 
+            #-----
+            # Here I create a flash
+            timer = 0
+            while timer < 10:
+                imgTestchart  = imCreateTestchartContinuousAndHalftoned(255, 255, sizeTilePatchHT)
+                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
+                imgT          = cv.fromarray(imgTestchart)
+                cv.ShowImage("winTestChart",imgT)    
+                frame = cv.QueryFrame(camera)
+                frame, dL, dLab, LabT, LabB, dY, XYZT, XYZB, dRGB = function_display_live_information(frame, widthF, heightF, sub_rec1, sub_rec2)
+                tabOscillographeDifferences[:,0:-1] = tabOscillographeDifferences[:,1:]
+                tabOscillographeDifferences[:,-1] = [dL, dLab, dY, dRGB]
+                frame = function_display_oscilloscope(frame, widthF, heightF, tabOscillographeDifferences)
+                cv.ShowImage("Window", frame)
+                cv.WaitKey(5)
+
+                imgTestchart  = imCreateTestchartContinuousAndHalftoned(0,0, sizeTilePatchHT)
+                imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
+                imgT          = cv.fromarray(imgTestchart)
+                cv.ShowImage("winTestChart",imgT)    
+                frame = cv.QueryFrame(camera)
+                frame, dL, dLab, LabT, LabB, dY, XYZT, XYZB, dRGB = function_display_live_information(frame, widthF, heightF, sub_rec1, sub_rec2)
+                tabOscillographeDifferences[:,0:-1] = tabOscillographeDifferences[:,1:]
+                tabOscillographeDifferences[:,-1] = [dL, dLab, dY, dRGB]
+                frame = function_display_oscilloscope(frame, widthF, heightF, tabOscillographeDifferences)
+                cv.ShowImage("Window", frame)
+                cv.WaitKey(5)
+                timer = timer +1
+            #-----
+
             # I display the stream again
             timer = 0
-            while timer < max_number_frame_to_wait_between_measurement:
+            while timer < max_number_frame_to_wait_between_measurement:                
                 frame = cv.QueryFrame(camera)
                 frame, dL, dLab, LabT, LabB, dY, XYZT, XYZB, dRGB = function_display_live_information(frame, widthF, heightF, sub_rec1, sub_rec2)
                     
@@ -300,7 +330,7 @@ def main():
 
     # and now get the response curve value for the ratio:
     # load the curve parameter
-    parameters_gamma = np.loadtxt(dirToSaveResults+prefixName+'_param_gamma_curve2.txt') 
+    parameters_gamma = np.loadtxt(dirToSaveResults+prefixName+'_param_gamma_curve1.txt') 
     ratio_with_RC1 = funSuperFittFunction(ratioRGB1, parameters_gamma[0], parameters_gamma[1], parameters_gamma[2], parameters_gamma[3])
     ratio_with_RC2 = funSuperFittFunction(ratioRGB2, parameters_gamma[0], parameters_gamma[1], parameters_gamma[2], parameters_gamma[3])
 

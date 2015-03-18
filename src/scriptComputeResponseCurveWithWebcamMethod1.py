@@ -45,9 +45,9 @@ if configTest:
 # config measurement
 if configMeasurement:
     prefixName         = 'test33'
-    stepVecLevel       = 128
+    stepVecLevel       = 64
     vecLevel           = np.round(np.hstack((np.arange(0, 255, stepVecLevel), 255)))
-    stepVecLevelSearch = 64
+    stepVecLevelSearch = 32
     vecSearchLevel     = np.round(np.hstack((np.arange(0,255, stepVecLevelSearch), 255)))
 
 
@@ -411,6 +411,8 @@ def funComputeFittedResponseCurve(responseCurve, vec_meas_curve):
     p0 = [1, 0, 2, 0]
 
     # do the optimization biatch
+    print y_meas
+    print x
     plsq = leastsq(residuals, p0, args=(y_meas, x))
     fitted_Response_Curve = peval(x,plsq[0])
     #print np.shape(plsq), plsq[0]
