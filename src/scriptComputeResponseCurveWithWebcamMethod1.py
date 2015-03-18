@@ -24,7 +24,7 @@ import sys, os, shutil
 
 configTest = False
 configMeasurement = True
-number_camera = 0
+number_camera = 1
 max_number_frame_to_wait_between_measurement = 50
 max_number_frame_to_keep  = 25
 tabOscillographeDifferences = np.zeros((4,max_number_frame_to_keep))
@@ -45,9 +45,9 @@ if configTest:
 # config measurement
 if configMeasurement:
     prefixName         = 'test33'
-    stepVecLevel       = 32
+    stepVecLevel       = 128
     vecLevel           = np.round(np.hstack((np.arange(0, 255, stepVecLevel), 255)))
-    stepVecLevelSearch = 16
+    stepVecLevelSearch = 64
     vecSearchLevel     = np.round(np.hstack((np.arange(0,255, stepVecLevelSearch), 255)))
 
 
@@ -154,17 +154,30 @@ def funGetResponseCurve(camera, widthF, heightF, sub_rec1, sub_rec2):
             #-----
             # Here I create a flash
             timer = 0
-            while timer < max_number_frame_to_wait_between_measurement:
+            while timer < 10:
                 imgTestchart  = imCreateTestchartContinuousAndHalftoned(255, 255, sizeTilePatchHT)
                 imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
                 imgT          = cv.fromarray(imgTestchart)
                 cv.ShowImage("winTestChart",imgT)    
-                cv.WaitKey(2)
+                frame = cv.QueryFrame(camera)
+                frame, dL, dLab, LabT, LabB, dY, XYZT, XYZB, dRGB = function_display_live_information(frame, widthF, heightF, sub_rec1, sub_rec2)
+                tabOscillographeDifferences[:,0:-1] = tabOscillographeDifferences[:,1:]
+                tabOscillographeDifferences[:,-1] = [dL, dLab, dY, dRGB]
+                frame = function_display_oscilloscope(frame, widthF, heightF, tabOscillographeDifferences)
+                cv.ShowImage("Window", frame)
+                cv.WaitKey(5)
+
                 imgTestchart  = imCreateTestchartContinuousAndHalftoned(0,0, sizeTilePatchHT)
                 imgT          = cv.CreateImage((widthF,heightF), cv.IPL_DEPTH_8U,1)
                 imgT          = cv.fromarray(imgTestchart)
                 cv.ShowImage("winTestChart",imgT)    
-                cv.WaitKey(2)
+                frame = cv.QueryFrame(camera)
+                frame, dL, dLab, LabT, LabB, dY, XYZT, XYZB, dRGB = function_display_live_information(frame, widthF, heightF, sub_rec1, sub_rec2)
+                tabOscillographeDifferences[:,0:-1] = tabOscillographeDifferences[:,1:]
+                tabOscillographeDifferences[:,-1] = [dL, dLab, dY, dRGB]
+                frame = function_display_oscilloscope(frame, widthF, heightF, tabOscillographeDifferences)
+                cv.ShowImage("Window", frame)
+                cv.WaitKey(5)
                 timer = timer +1
             #-----            
 

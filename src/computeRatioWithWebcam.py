@@ -23,7 +23,7 @@ import sys, os, shutil
 
 configTest = False
 configMeasurement = True
-number_camera = 0
+number_camera = 1
 max_number_frame_to_wait_between_measurement = 50
 max_number_frame_to_keep  = 25
 tabOscillographeDifferences = np.zeros((4,max_number_frame_to_keep))
@@ -78,8 +78,8 @@ def funDisplayWebcamAndTakePictures(number_camera):
     heightFrame  = int(480)    
 
     # rectangle coordinates
-    sub_rec1 = np.array([220,200,80,80])
-    sub_rec2 = np.array([340,200,80,80])
+    sub_rec1 = np.array([240,200,60,60])
+    sub_rec2 = np.array([340,200,60,60])
        
     # display one test-chart black/green to postion the window
     imgTestchart = imCreateTestchartContinuousAndHalftoned(mid_level,mid_level, sizeTilePatchHT)

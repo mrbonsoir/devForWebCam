@@ -427,7 +427,7 @@ def funDoErrorDiffusion_JarvisAndAll(imageData):
     return imageDataHalftoned
 
 
-def imCreateTestchartPatchBase(levelPatch, levelBase):
+def imCreateTestchartPatchBase(levelPatch, levelBase, background=128):
     '''
     The function takes two input values as input such that levelPatch < levelBase.
     The resulting test chart has a fixed size-
@@ -449,6 +449,26 @@ def imCreateTestchartPatchBase(levelPatch, levelBase):
     imagePatchBase[:,0.5*width:width,1] = levelBase[1]
     imagePatchBase[:,0.5*width:width,2] = levelBase[2]
     
+    # add a uniform background around the targeted area
+    if background != 0:
+        # left and right
+        imagePatchBase[:, 0:280,0]    =  np.ones((720,280),np.uint8)*background
+        imagePatchBase[:, 0:280,1]    =  np.ones((720,280),np.uint8)*background
+        imagePatchBase[:, 0:280,2]    =  np.ones((720,280),np.uint8)*background
+        imagePatchBase[:, 744:1024,0] =  np.ones((720,280),np.uint8)*background
+        imagePatchBase[:, 744:1024,1] =  np.ones((720,280),np.uint8)*background
+        imagePatchBase[:, 744:1024,2] =  np.ones((720,280),np.uint8)*background
+
+        # top and bottom
+        imagePatchBase[0:180,:,0]     =  np.ones((180,1024),np.uint8)*background
+        imagePatchBase[0:180,:,1]     =  np.ones((180,1024),np.uint8)*background
+        imagePatchBase[0:180,:,2]     =  np.ones((180,1024),np.uint8)*background
+        imagePatchBase[540:720,:,0]   =  np.ones((180,1024),np.uint8)*background
+        imagePatchBase[540:720,:,1]   =  np.ones((180,1024),np.uint8)*background
+        imagePatchBase[540:720,:,2]   =  np.ones((180,1024),np.uint8)*background
+
+
+
     return imagePatchBase
 
 
